@@ -1,0 +1,59 @@
+html {
+    height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#titlebar {
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    height: 40px;
+    width: 100%;
+    background: #000;
+}
+
+#content {
+    overflow: auto;
+    position:fixed !important;
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    margin-bottom: 20px;
+}
+
+#from {
+    fron-weight: bold;
+    margin-right: 20px;
+}
+
+#writeArea {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+#writeArea input{
+    width: 99%;
+}
+
+[class*='close-'] {
+  color: #777;
+  font: 25px/100% arial, sans-serif;
+  position: absolute;
+  right: 5px;
+  text-decoration: none;
+  text-shadow: 0 1px 0 #fff;
+  top: 5px;
+}
+
+.close-thick:after {
+  content: '✖'; /* UTF-8 symbol */
+}
+
+.close-thick:hover {
+    color: red;
+    top: 20px;
+}
