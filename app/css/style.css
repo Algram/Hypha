@@ -24,7 +24,7 @@ p {
     bottom:0;
     left:0;
     padding: 7px;
-    margin-left: 150px;
+    margin-left: 180px;
     background: yellow;
 }
 
@@ -32,7 +32,7 @@ p {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 150px;
+    width: 180px;
     color: #fff;
     background: black;
 }

@@ -28,6 +28,8 @@ app.on('ready', function() {
       frame: true,
       x: 400,
       y: 400,
+      minWidth: 500,
+      minHeight: 300,
       overlayScrollbar: true
   });
 
@@ -52,7 +54,7 @@ app.on('ready', function() {
 
 function initializeIRC() {
     var config = {
-    	channels: ["#linuxmasterrace"],
+    	channels: ["#linuxmasterracecirclejerk", "#supersecretproject"],
     	server: "irc.snoonet.org",
     	name: "testignoreme"
     };
@@ -72,8 +74,22 @@ function initializeIRC() {
           mainWindow.webContents.send('messageReceived', from, to, message + '\n');
     });
 
+    client.addListener('topic', function(channel, nicks) {
+    //    console.log('names: ', nicks);
+    });
+
     client.addListener('names', function(channel, nicks) {
-        console.log('names: ', nicks);
+        let channels = client.chans;
+        let nick = client.nick;
+
+        for (let key in channels) {
+            let channel = channels[key];
+            let channelName = channel.serverName;
+            let channelUsers = channel.users;
+
+            mainWindow.webContents.send(
+                'channelData', nick, channelName, channelUsers);
+        }
     });
 
     client.addListener('error', function(message) {
