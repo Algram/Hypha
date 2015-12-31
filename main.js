@@ -1,7 +1,7 @@
 'use strict';
 const electron = require('electron');
-const app = electron.app;  // Module to control application life.
-const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
 const irc = require('irc');
 const ipcMain = require('electron').ipcMain;
 
@@ -34,12 +34,12 @@ app.on('ready', function() {
   mainWindow.setMenu(null);
 
   // and load the index.html of the app.
-  mainWindow.loadURL('file://' + __dirname + '/index.html');
+  mainWindow.loadURL('file://' + __dirname + '/app/index.html');
 
   initializeIRC();
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {

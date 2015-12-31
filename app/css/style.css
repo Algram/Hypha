@@ -1,7 +1,7 @@
 html {
     height: 100%;
-  width: 100%;
-  overflow: hidden;
+    width: 100%;
+    overflow: hidden;
 }
 
 #titlebar {
@@ -15,17 +15,20 @@ html {
 #content {
     overflow: auto;
     position:fixed !important;
-    position:absolute;
     top:0;
     right:0;
     bottom:0;
     left:0;
-    margin-bottom: 20px;
+    margin-left: 150px;
+    background: yellow;
 }
 
-#from {
-    fron-weight: bold;
-    margin-right: 20px;
+#channelList {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 150px;
+    background: black;
 }
 
 #writeArea {
@@ -38,6 +41,13 @@ html {
 #writeArea input{
     width: 99%;
 }
+
+#from {
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+
 
 [class*='close-'] {
   color: #777;
