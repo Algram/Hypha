@@ -52,9 +52,9 @@ app.on('ready', function() {
 
 function initializeIRC() {
     var config = {
-    	channels: ["#linuxmasterracecirclejerk"],
+    	channels: ["#linuxmasterrace"],
     	server: "irc.snoonet.org",
-    	name: "Algram__"
+    	name: "testignoreme"
     };
 
 
@@ -70,6 +70,10 @@ function initializeIRC() {
 
     client.addListener('message', function (from, to, message) {
           mainWindow.webContents.send('messageReceived', from, to, message + '\n');
+    });
+
+    client.addListener('names', function(channel, nicks) {
+        console.log('names: ', nicks);
     });
 
     client.addListener('error', function(message) {
