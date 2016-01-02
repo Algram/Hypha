@@ -37,6 +37,10 @@ p {
     background: black;
 }
 
+#channelList li {
+    list-style-type: none;
+}
+
 #from {
     font-weight: bold;
     margin-right: 20px;
