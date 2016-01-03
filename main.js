@@ -54,11 +54,17 @@ app.on('ready', function() {
 });
 
 function initializeIRC() {
-    var config = {
-    	channels: ["#linuxmasterracecirclejerk", "#supersecretproject"],
-    	server: "irc.snoonet.org",
+    let config = {
+    	channels: ["#dnkoasdklpnadsnp", "#nonexistentas", "#linuxmasterrace"],
+    	server: "irc.freenode.net",
     	name: "testignoreme"
     };
+
+    /*let config = {
+    	channels: ["#factoriao", "#adasdad"],
+    	server: "irc.esper.net",
+    	name: "testignoreme"
+    };*/
 
     let client = new irc.Client(config.server, config.name, {
     	channels: config.channels
@@ -80,12 +86,19 @@ function initializeIRC() {
         }
     });
 
-    client.addListener('message', function (from, to, message) {
+    //MESSAGE RECEIVED
+    client.addListener('message', function (from, to, messageContent) {
+        let message = {
+            from: from,
+            to: to,
+            message: messageContent
+        }
+
         channels.getSelectedChannel(function(r) {
             channels.addMessageToChannel(r.name, message);
         });
 
-        mainWindow.webContents.send('messageReceived', from, to, message + '\n');
+        mainWindow.webContents.send('messageReceived', message);
     });
 
 
@@ -95,9 +108,16 @@ function initializeIRC() {
     //RECEIVING EVENTS
 
 
-    ipcMain.on('messageSent', function(event, arg) {
+    ipcMain.on('messageSent', function(event, messageContent) {
         channels.getSelectedChannel(function(channel) {
-            client.say(channel.name, arg);
+            let message = {
+                from: config.name,
+                to: null,
+                message: messageContent
+            }
+
+            channels.addMessageToChannel(channel.name, message);
+            client.say(channel.name, message.message);
         })
     });
 

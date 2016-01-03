@@ -4,10 +4,6 @@ html {
     overflow: hidden;
 }
 
-p {
-    margin: 5px 0 5px 0;
-}
-
 #titlebar {
     -webkit-user-select: none;
     -webkit-app-region: drag;
@@ -26,6 +22,7 @@ p {
     padding: 7px;
     margin-left: 180px;
     background: rgb(40, 40, 40);
+    color: rgb(220, 220, 220);
 }
 
 #channelList {
@@ -39,20 +36,40 @@ p {
 }
 
 #channelList ul {
-    padding: 0 10px;
+    padding: 0;
 }
 
-#channelList li {
+#channelList li{
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     list-style-type: none;
-    padding-bottom: 10px;
+    padding: 7px 0 7px 10px;
+    background: rgb(40, 40, 40);
+    color: rgb(160, 160, 160);
 }
 
-#from {
-    font-weight: bold;
-    margin-right: 20px;
+#channelList li:hover {
+    cursor: pointer;
+	background: rgb(60, 60, 60);
+}
+
+.selected {
+    background: rgb(60, 60, 60) !important;
+}
+
+line {
+  display: block;
+}
+
+nick {
+  display: inline-block;
+  width: 100px;
+  text-overflow: ellipsis;
+}
+
+#messageArea {
+    padding: 7px 0 7px 10px;
 }
 
 #writeArea {
@@ -74,6 +91,7 @@ p {
     border-radius: none;
     padding: 5px;
     border: solid 1px #dcdcdc;
+    color: rgb(40, 40, 40);
 }
 
 #writeArea input:focus {

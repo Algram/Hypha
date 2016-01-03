@@ -97,7 +97,7 @@ exports.addMessageToChannel = function(name, message, callback) {
         let channel = channels[key];
 
         if (channel.name == name) {
-            
+
             channel.messages.push(message);
 
             // Pass the channel to the callback (the calling context).
@@ -114,15 +114,17 @@ exports.getMessagesOfChannel = function(name, callback) {
     callback = (callback || noop);
 
     // Create the new channel instance.
+    let retChannel;
     for (let key in channels) {
         let channel = channels[key];
 
         if (channel.name == name) {
-
-            // Pass the channel to the callback (the calling context).
-            callback(channel.messages);
+            retChannel = channel;
         }
     }
+
+    // Pass the channel to the callback (the calling context).
+    callback(retChannel.messages);
 
     // Return this object reference to allow for method chaining.
     return(this);
