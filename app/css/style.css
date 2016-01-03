@@ -25,20 +25,29 @@ p {
     left:0;
     padding: 7px;
     margin-left: 180px;
-    background: yellow;
+    background: rgb(40, 40, 40);
 }
 
 #channelList {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 180px;
+    width: 179px;
     color: #fff;
-    background: black;
+    background: rgb(40, 40, 40);
+    border-right: 1px solid rgb(60, 60, 60);
+}
+
+#channelList ul {
+    padding: 0 10px;
 }
 
 #channelList li {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     list-style-type: none;
+    padding-bottom: 10px;
 }
 
 #from {
@@ -51,8 +60,8 @@ p {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 7px 17px 7px 7px;
-    background: aqua;
+    padding: 7px 20px 7px 7px;
+    background: rgb(60, 60, 60);
 }
 
 #writeArea input {
@@ -69,23 +78,4 @@ p {
 
 #writeArea input:focus {
     outline: none;
-}
-
-[class*='close-'] {
-  color: #777;
-  font: 25px/100% arial, sans-serif;
-  position: absolute;
-  right: 5px;
-  text-decoration: none;
-  text-shadow: 0 1px 0 #fff;
-  top: 5px;
-}
-
-.close-thick:after {
-  content: '✖'; /* UTF-8 symbol */
-}
-
-.close-thick:hover {
-    color: red;
-    top: 20px;
 }
