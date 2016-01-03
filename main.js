@@ -4,6 +4,7 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const irc = require('irc');
 const ipcMain = require('electron').ipcMain;
+const channels = require('./app/js/channels');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -59,46 +60,76 @@ function initializeIRC() {
     	name: "testignoreme"
     };
 
-
     let client = new irc.Client(config.server, config.name, {
     	channels: config.channels
     });
 
-    client.addListener('registered', function(message) {
-        /*setTimeout(function () {
-            client.say('#supersecretproject', "test");
-        }, 4000);*/
-    });
-
-    client.addListener('message', function (from, to, message) {
-          mainWindow.webContents.send('messageReceived', from, to, message + '\n');
-    });
-
-    client.addListener('topic', function(channel, nicks) {
-    //    console.log('names: ', nicks);
-    });
-
     client.addListener('names', function(channel, nicks) {
-        let channels = client.chans;
+        let availChannels = client.chans;
         let nick = client.nick;
 
-        for (let key in channels) {
-            let channel = channels[key];
+        for (let key in availChannels) {
+            let channel = availChannels[key];
             let channelName = channel.serverName;
             let channelUsers = channel.users;
 
             mainWindow.webContents.send(
                 'channelData', nick, channelName, channelUsers);
+
+            channels.addChannel(channelName, nick, channelUsers);
         }
     });
 
+    client.addListener('message', function (from, to, message) {
+        channels.getSelectedChannel(function(r) {
+            channels.addMessageToChannel(r.name, message);
+        });
+
+        mainWindow.webContents.send('messageReceived', from, to, message + '\n');
+    });
+
+
+
+
+
+    //RECEIVING EVENTS
+
+
+    ipcMain.on('messageSent', function(event, arg) {
+        channels.getSelectedChannel(function(channel) {
+            client.say(channel.name, arg);
+        })
+    });
+
+    ipcMain.on('channelSelected', function(event, arg) {
+        channels.setSelectedChannel(arg, function(r) {
+            channels.getMessagesOfChannel(r.name, function(messages) {
+                event.sender.send('channelSelected_reply', messages);
+            })
+        });
+    });
+
+
+
+
+
+    /*
+    Listening to errors, otherwise the program will exit on error
+     */
     client.addListener('error', function(message) {
         console.log('error: ', message);
     });
 
-    ipcMain.on('messageSent', function(event, arg) {
-      client.say(config.channels[0], arg);
-
-      //event.sender.send('messageSent', 'message received');
+    /*client.addListener('registered', function(message) {
+        setTimeout(function () {
+            client.say('#supersecretproject', "test");
+        }, 4000);
     });
+
+    client.addListener('topic', function(channel, nicks) {
+        console.log('names: ', nicks);
+
+
+        //event.sender.send('messageSent', 'message received');
+    });*/
 }

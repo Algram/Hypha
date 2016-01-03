@@ -1,7 +1,7 @@
 'use strict';
 const ipcRenderer = require('electron').ipcRenderer;
 
-let channels = [];
+let channels2 = [];
 let currentChannel = '';
 let userName = '';
 
@@ -33,10 +33,20 @@ ipcRenderer.on('messageReceived', function(event, from, to, message) {
 ipcRenderer.on('channelData', function(event, nick, channelName, channelUsers) {
     userName = nick;
 
-    if (channels.indexOf(channelName) == -1) {
-        channels.push(channelName);
+    if (channels2.indexOf(channelName) == -1) {
+        channels2.push(channelName);
         let line = '<li>' + channelName + '</li>';
         $('#channelList ul').append(line);
     }
 
+});
+
+$('#channelList').on('click', 'li', function(e) {
+    e.preventDefault();
+
+    ipcRenderer.send('channelSelected', $(this).text());
+})
+
+ipcRenderer.on('channelSelected_reply', function(event, arg) {
+    console.log(arg);
 });
