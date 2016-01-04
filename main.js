@@ -141,11 +141,18 @@ function initializeIRC() {
         })
     });
 
-
+    /*
+    In the renderer a channel got selected and the event contains
+    the name of the selected channel
+     */
     ipcMain.on('channelSelected', function(event, arg) {
         channels.setSelectedChannel(arg, function(r) {
-            channels.getMessagesOfChannel(r.name, function(messages) {
+            /*channels.getMessagesOfChannel(r.name, function(messages) {
                 event.sender.send('channelSelected_reply', messages);
+            })*/
+
+            channels.getSelectedChannel(function(channel) {
+                event.sender.send('channelSelected_reply', channel);
             })
         });
     });

@@ -25,13 +25,36 @@ $("#messageInput").keyup(function (e) {
     }
 });
 
+$("#messageInput").keydown(function (e) {
+    if (e.keyCode == 9) {
+        e.preventDefault();
+    }
+});
+
+$("#messageInput").keyup(function (e) {
+    if (e.keyCode == 9) {
+        e.preventDefault();
+
+        let inputContent = $(this).val();
+        let lastWord = inputContent.split(' ').pop();
+
+        if (inputContent != '') {
+            autocomplete(lastWord, function(name) {
+                inputContent = inputContent.substring(
+                    0, inputContent.lastIndexOf(" "));
+
+                $("#messageInput").val(inputContent + name + ': ');
+            })
+        }
+    }
+});
+
 $('#channelList').on('click', 'li', function(e) {
     e.preventDefault();
 
     $('#channelList li').removeClass('selected');
     $(this).addClass('selected');
 
-    selectedChannel = $(this).text();
     ipcRenderer.send('channelSelected', $(this).text());
 })
 
@@ -51,14 +74,17 @@ ipcRenderer.on('channelData', function(event, nick, channelName, channelUsers) {
 });
 
 ipcRenderer.on('messageReceived', function(event, message) {
-    if (message.to == selectedChannel) {
+    if (message.to == selectedChannel.name) {
         appendMessage(message);
     }
     $("#messageArea").animate({ scrollTop: $("#messageArea")[0].scrollHeight}, 0);
 });
 
 
-ipcRenderer.on('channelSelected_reply', function(event, messages) {
+ipcRenderer.on('channelSelected_reply', function(event, channel) {
+    selectedChannel = channel;
+    let messages = channel.messages;
+
     $('#messageArea').empty();
 
     for (let key in messages) {
@@ -71,4 +97,18 @@ function appendMessage(message) {
     console.log(message.message);
     let line = '<line><nick>' + message.from + '</nick><message>' + message.message + '</message></line>';
     $('#messageArea').append(line);
+}
+
+function autocomplete(str, callback) {
+    let users = Object.keys(selectedChannel.users);
+
+    for (let key in users) {
+        let user = users[key];
+        user = user.split(':')[0];
+
+        //Check if str is the start of user
+        if(user.indexOf(str) == 0) {
+            callback(user);
+        }
+    }
 }
