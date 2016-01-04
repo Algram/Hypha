@@ -54,8 +54,8 @@ html {
 	background: rgb(60, 60, 60);
 }
 
-.selected {
-    background: rgb(60, 60, 60) !important;
+#channelList li.selected {
+    background: rgb(60, 60, 60);
 }
 
 line {

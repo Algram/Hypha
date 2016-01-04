@@ -55,21 +55,25 @@ app.on('ready', function() {
 
 function initializeIRC() {
     let config = {
-    	channels: ["#dnkoasdklpnadsnp", "#nonexistentas", "#linuxmasterrace"],
+    	channels: ["#dblabla", "#nonexistentas", "#linuxmasterrace"],
     	server: "irc.freenode.net",
     	name: "testignoreme"
     };
 
     /*let config = {
-    	channels: ["#factoriao", "#adasdad"],
-    	server: "irc.esper.net",
-    	name: "testignoreme"
+    	channels: ["#linuxmasterracecirclejerk", "#supersecretproject"],
+    	server: "irc.snoonet.org",
+    	name: "Algram_"
     };*/
 
     let client = new irc.Client(config.server, config.name, {
     	channels: config.channels
     });
 
+    /*
+    This event happens everytime the client connects to a channel
+    If it is successful, all the channel-data is provided
+     */
     client.addListener('names', function(channel, nicks) {
         let availChannels = client.chans;
         let nick = client.nick;
@@ -79,14 +83,18 @@ function initializeIRC() {
             let channelName = channel.serverName;
             let channelUsers = channel.users;
 
+            //Add the channel to the channels module
+            channels.addChannel(channelName, nick, channelUsers);
+
+            //Tell the renderer that channel data was received and send it over
             mainWindow.webContents.send(
                 'channelData', nick, channelName, channelUsers);
-
-            channels.addChannel(channelName, nick, channelUsers);
         }
     });
 
-    //MESSAGE RECEIVED
+    /*
+    This event gets fired when the client receives a new message
+     */
     client.addListener('message', function (from, to, messageContent) {
         let message = {
             from: from,
@@ -94,32 +102,45 @@ function initializeIRC() {
             message: messageContent
         }
 
-        channels.getSelectedChannel(function(r) {
-            channels.addMessageToChannel(r.name, message);
-        });
+        //Add the message to the channel object
+        channels.addMessageToChannel(message.to, message);
 
+        //Tell the renderer that a message was received and send it over
         mainWindow.webContents.send('messageReceived', message);
     });
 
+    /*
+    Listening to errors, otherwise the program will exit on error
+     */
+    client.addListener('error', function(message) {
+        console.log('error: ', message);
+    });
 
 
+    //////////////////////
+    // Receiving Events //
+    //////////////////////
 
-
-    //RECEIVING EVENTS
-
-
+    /*
+    They renderer wants to send a message and fires the event for it
+    that contains the message content
+     */
     ipcMain.on('messageSent', function(event, messageContent) {
         channels.getSelectedChannel(function(channel) {
             let message = {
-                from: config.name,
-                to: null,
+                from: channel.username,
+                to: channel.name,
                 message: messageContent
             }
 
-            channels.addMessageToChannel(channel.name, message);
-            client.say(channel.name, message.message);
+            //Add the message to the appropriate channel
+            channels.addMessageToChannel(message.to, message);
+
+            //Tell the client to send the message to its channel
+            client.say(message.to, message.message);
         })
     });
+
 
     ipcMain.on('channelSelected', function(event, arg) {
         channels.setSelectedChannel(arg, function(r) {
@@ -133,12 +154,7 @@ function initializeIRC() {
 
 
 
-    /*
-    Listening to errors, otherwise the program will exit on error
-     */
-    client.addListener('error', function(message) {
-        console.log('error: ', message);
-    });
+
 
     /*client.addListener('registered', function(message) {
         setTimeout(function () {
