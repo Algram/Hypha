@@ -83,9 +83,9 @@ message {
 #messageArea {
     overflow: auto;
     position:fixed !important;
-    top:0;
+    top: 3px;
     right:0;
-    bottom: 47px;
+    bottom: 50px;
     left:0;
     margin-left: 180px;
     padding: 7px 0 7px 10px;
@@ -117,4 +117,18 @@ message {
 
 #writeArea input:focus {
     outline: none;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 5px;
+  background: rgba(140, 140, 140, .33);
 }
