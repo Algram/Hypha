@@ -103,7 +103,6 @@ ipcRenderer.on('messageReceived', function(event, message) {
             return ($(this).text() === message.to)
         });
 
-        console.log(affectedChannel);
         $(affectedChannel).addClass('unread');
     }
 
