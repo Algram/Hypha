@@ -5,6 +5,9 @@ const path = require('path');
 let channels2 = [];
 let selectedChannel;
 let userName;
+jQuery.fn.reverse = function() {
+    return this.pushStack(this.get().reverse(), arguments);
+};
 
 $("#messageInput").keyup(function (e) {
     if (e.keyCode == 13) {
@@ -103,7 +106,14 @@ ipcRenderer.on('channelSelected_reply', function(event, channel) {
 });
 
 function appendMessage(message) {
-    let line = '<line><nick>' + message.from + '</nick><message>' + message.message + '</message></line>';
+    let nick = message.from;
+
+    //Remove nick if message before was sent by the same nick
+    if (!lastNicksUnique(nick)) {
+        nick = '';
+    }
+
+    let line = '<line><nick>' + nick + '</nick><message>' + message.message + '</message></line>';
     $('#messageArea').append(line);
 
     //Check if username is mentioned somewhere in the message
@@ -111,6 +121,35 @@ function appendMessage(message) {
     if (pattern.test(message.message)) {
         $('#messageArea line:last message').addClass('highlighted');
     }
+}
+
+/*
+Clean that up and comment or I will forget by tomorrow
+ */
+function lastNicksUnique(nextNick) {
+    let unique = true;
+    let lastNicks = $('#messageArea line nick');
+    let iteratedNicks = [];
+
+    $(lastNicks).reverse().each(function() {
+        iteratedNicks.push($(this).text());
+
+        if ($(this).text() != '') {
+            return false;
+        }
+    })
+
+    for (let key in iteratedNicks) {
+        let nick = iteratedNicks[key];
+        if (nick != nextNick) {
+            unique = true;
+        } else if (nick == '' || nick == nextNick) {
+            unique = false;
+            break;
+        }
+    }
+
+    return unique;
 }
 
 function autocomplete(str, callback) {

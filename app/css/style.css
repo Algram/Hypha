@@ -63,16 +63,21 @@ html {
 }
 
 line {
-  display: block;
+  display: flex;
 }
 
 nick {
-  display: inline-block;
+  display: block;
   width: 100px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  vertical-align: top;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+message {
+    display: block;
 }
 
 #messageArea {
