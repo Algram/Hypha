@@ -22,6 +22,34 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
+<<<<<<< HEAD
+// Initial createWindow
+  createWindow();
+
+
+  // Create a tray icon, GPL mock icon from http://www.iconarchive.com/show/captiva-icons-by-bokehlicia/chat-irc-icon.html
+  appIcon = new Tray('app/images/logo.png');
+  appIcon.setToolTip('IRClean');
+  let contextMenu = Menu.buildFromTemplate([
+    { label: 'Quit', click: function() { app.quit(); }}
+  ]);
+  appIcon.setContextMenu(contextMenu);
+
+
+  // Show and hide the application
+  appIcon.on('click', function() {
+
+    if (mainWindow != null && mainWindow.isVisible()) {
+      mainWindow.hide();
+    }
+    else if(mainWindow !== null && mainWindow.isVisible() == 0) {
+      mainWindow.show();
+    }
+   if(mainWindow == null) {
+    createWindow();
+  }
+ });
+=======
   // Create the browser window.
   mainWindow = new BrowserWindow({
       width: 800,
@@ -33,6 +61,7 @@ app.on('ready', function() {
       minHeight: 300,
       overlayScrollbar: true
   });
+>>>>>>> d1006bc036a8c551687732a8321d751c98f22875
 
   mainWindow.setMenu(null);
 
@@ -53,6 +82,25 @@ app.on('ready', function() {
   });
 });
 
+<<<<<<< HEAD
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+      width: 800,
+      height: 600,
+      frame: true,
+      x: 400,
+      y: 400,
+      minWidth: 500,
+      minHeight: 300,
+      overlayScrollbar: true,
+      icon: __dirname + '/app/images/logo.png'
+  });
+}
+
+
+=======
+>>>>>>> d1006bc036a8c551687732a8321d751c98f22875
 function initializeIRC() {
     /*let config = {
     	channels: ["#dblabla", "#nonexistentas", "#linuxmasterrace"],
@@ -61,7 +109,11 @@ function initializeIRC() {
     };*/
 
     let config = {
+<<<<<<< HEAD
+    	channels: ["#supersecretproject"],
+=======
     	channels: ["#linuxmasterrace", "#supersecretproject"],
+>>>>>>> d1006bc036a8c551687732a8321d751c98f22875
     	server: "irc.snoonet.org",
     	name: "Algram_"
     };
