@@ -4,6 +4,15 @@ html {
     overflow: hidden;
 }
 
+a {
+    text-decoration: underline;
+}
+
+a:hover {
+    color: rgb(180, 180, 180);
+    cursor: pointer;
+}
+
 #titlebar {
     -webkit-user-select: none;
     -webkit-app-region: drag;

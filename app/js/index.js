@@ -1,6 +1,7 @@
 'use strict';
 const ipcRenderer = require('electron').ipcRenderer;
 const path = require('path');
+const shell = require('electron').shell;
 
 let channels2 = [];
 let selectedChannel;
@@ -66,6 +67,17 @@ $('#channelList').on('click', 'li', function(e) {
     ipcRenderer.send('channelSelected', $(this).text());
 })
 
+$('#messageArea').on('click', 'a', function(e) {
+    e.preventDefault();
+
+    if ($(this).text().match(/^[^/]+:\/\//)) {
+        shell.openExternal($(this).text());
+    } else {
+        shell.openExternal('http://' + $(this).text());
+    }
+})
+
+
 
 //////////////////////
 // Receiving Events //
@@ -125,6 +137,30 @@ function appendMessage(message) {
     if (pattern.test(message.message)) {
         $('#messageArea line:last message').addClass('highlighted');
     }
+
+    //Check if message contains links
+    let links = findLinks(message.message);
+    if (links != null) {
+        let insertStr = message.message;
+
+        for (let key in links) {
+            let link = links[key];
+
+            let start = insertStr.indexOf(link);
+            insertStr = insertStr.insert(start, '<a>');
+
+            let end = start + link.length + 3;
+            insertStr = insertStr.insert(end, '</a>');
+        }
+
+        $('#messageArea line:last message').html(insertStr);
+    }
+}
+
+function findLinks(str) {
+    let pattern = /\b(?:[a-z]{2,}?:\/\/)?[^\s/]+\.\w{2,}(?::\d{1,5})?(?:\/[^\s]*\b|\b)(?![:.?#]\S)/gi;
+
+    return str.match(pattern);
 }
 
 /*
@@ -179,3 +215,11 @@ function doNotify(title, body) {
 
     new Notification(options.title, options);
 }
+
+
+String.prototype.insert = function (index, string) {
+  if (index > 0)
+    return this.substring(0, index) + string + this.substring(index, this.length);
+  else
+    return string + this;
+};

@@ -87,18 +87,18 @@ function createWindow() {
 
 
 function initializeIRC() {
-    /*let config = {
+    let config = {
     	channels: ["#dblabla", "#nonexistentas", "#linuxmasterrace"],
     	server: "irc.freenode.net",
     	name: "testignoreme"
-    };*/
+    };
 
 
-    let config = {
+    /*let config = {
     	channels: ["#supersecretproject"],
     	server: "irc.snoonet.org",
-    	name: "_---_---_"
-    };
+    	name: "Algram_"
+    };*/
 
     let client = new irc.Client(config.server, config.name, {
     	channels: config.channels
