@@ -67,6 +67,10 @@ a:hover {
     background: rgb(60, 60, 60);
 }
 
+#channelList li.unread {
+    color: yellow;
+}
+
 #messageArea message.highlighted {
     font-weight: bold;
 }

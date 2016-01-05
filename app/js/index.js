@@ -62,6 +62,7 @@ $('#channelList').on('click', 'li', function(e) {
     e.preventDefault();
 
     $('#channelList li').removeClass('selected');
+    $(this).removeClass('unread');
     $(this).addClass('selected');
 
     ipcRenderer.send('channelSelected', $(this).text());
@@ -97,6 +98,13 @@ ipcRenderer.on('messageReceived', function(event, message) {
     //If message is to currently selected channel, display it there
     if (message.to == selectedChannel.name) {
         appendMessage(message);
+    } else {
+        let affectedChannel = $("#channelList li").filter(function() {
+            return ($(this).text() === message.to)
+        });
+
+        console.log(affectedChannel);
+        $(affectedChannel).addClass('unread');
     }
 
     //Check if username is mentioned somewhere in the message
