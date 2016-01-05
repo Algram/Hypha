@@ -136,7 +136,7 @@ function appendMessage(message) {
         nick = '';
     }
 
-    let line = '<line>' + '<timestamp>' + moment().format("HH:mm:ss") + '</timestamp>' + '<nick>' + nick + '</nick><message>' + message.message + '</message></line>';
+    let line = '<line><nick>' + nick + '</nick><message>' + message.message + '</message></line>';
     $('#messageArea').append(line);
 
     //Check if username is mentioned somewhere in the message
