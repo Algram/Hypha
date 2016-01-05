@@ -53,8 +53,6 @@ $("#messageInput").keyup(function (e) {
 $('#channelList').on('click', 'li', function(e) {
     e.preventDefault();
 
-    doNotify();
-
     $('#channelList li').removeClass('selected');
     $(this).addClass('selected');
 
@@ -77,9 +75,17 @@ ipcRenderer.on('channelData', function(event, nick, channelName, channelUsers) {
 });
 
 ipcRenderer.on('messageReceived', function(event, message) {
+    //If message is to currently selected channel, display it there
     if (message.to == selectedChannel.name) {
         appendMessage(message);
     }
+
+    //Check if username is mentioned somewhere in the message
+    let pattern = new RegExp('\\b' + selectedChannel.username + '\\b', 'ig');
+    if (pattern.test(message.message)) {
+        doNotify(selectedChannel.name + ' ' + message.from, message.message);
+    }
+
     $("#messageArea").animate({ scrollTop: $("#messageArea")[0].scrollHeight}, 0);
 });
 
@@ -99,6 +105,12 @@ ipcRenderer.on('channelSelected_reply', function(event, channel) {
 function appendMessage(message) {
     let line = '<line><nick>' + message.from + '</nick><message>' + message.message + '</message></line>';
     $('#messageArea').append(line);
+
+    //Check if username is mentioned somewhere in the message
+    let pattern = new RegExp('\\b' + selectedChannel.username + '\\b', 'ig');
+    if (pattern.test(message.message)) {
+        $('#messageArea line:last message').addClass('highlighted');
+    }
 }
 
 function autocomplete(str, callback) {
@@ -115,12 +127,12 @@ function autocomplete(str, callback) {
     }
 }
 
+function doNotify(title, body) {
+    let options = {
+        title: title,
+        body: body,
+        icon: path.join(__dirname, 'icon.png')
+    };
 
-let options = {
-    title: "Basic Notification",
-    body: "Short message part"
-};
-
-function doNotify() {
     new Notification(options.title, options);
 }

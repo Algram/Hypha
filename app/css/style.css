@@ -58,6 +58,10 @@ html {
     background: rgb(60, 60, 60);
 }
 
+#messageArea message.highlighted {
+    font-weight: bold;
+}
+
 line {
   display: block;
 }
@@ -68,6 +72,7 @@ nick {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  vertical-align: top;
 }
 
 #messageArea {
