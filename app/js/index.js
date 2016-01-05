@@ -1,5 +1,6 @@
 'use strict';
 const ipcRenderer = require('electron').ipcRenderer;
+const path = require('path');
 
 let channels2 = [];
 let selectedChannel;
@@ -52,6 +53,8 @@ $("#messageInput").keyup(function (e) {
 $('#channelList').on('click', 'li', function(e) {
     e.preventDefault();
 
+    doNotify();
+
     $('#channelList li').removeClass('selected');
     $(this).addClass('selected');
 
@@ -94,7 +97,6 @@ ipcRenderer.on('channelSelected_reply', function(event, channel) {
 });
 
 function appendMessage(message) {
-    console.log(message.message);
     let line = '<line><nick>' + message.from + '</nick><message>' + message.message + '</message></line>';
     $('#messageArea').append(line);
 }
@@ -111,4 +113,14 @@ function autocomplete(str, callback) {
             callback(user);
         }
     }
+}
+
+
+let options = {
+    title: "Basic Notification",
+    body: "Short message part"
+};
+
+function doNotify() {
+    new Notification(options.title, options);
 }

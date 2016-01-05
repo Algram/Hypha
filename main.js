@@ -54,17 +54,17 @@ app.on('ready', function() {
 });
 
 function initializeIRC() {
-    let config = {
+    /*let config = {
     	channels: ["#dblabla", "#nonexistentas", "#linuxmasterrace"],
     	server: "irc.freenode.net",
     	name: "testignoreme"
-    };
-
-    /*let config = {
-    	channels: ["#linuxmasterracecirclejerk", "#supersecretproject"],
-    	server: "irc.snoonet.org",
-    	name: "Algram_"
     };*/
+
+    let config = {
+    	channels: ["#linuxmasterrace", "#supersecretproject"],
+    	server: "irc.ssfsdfnoonet.org",
+    	name: "Algram_"
+    };
 
     let client = new irc.Client(config.server, config.name, {
     	channels: config.channels
@@ -125,6 +125,7 @@ function initializeIRC() {
     They renderer wants to send a message and fires the event for it
     that contains the message content
      */
+
     ipcMain.on('messageSent', function(event, messageContent) {
         channels.getSelectedChannel(function(channel) {
             let message = {

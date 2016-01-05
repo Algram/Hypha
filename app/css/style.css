@@ -65,11 +65,22 @@ line {
 nick {
   display: inline-block;
   width: 100px;
+  overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 #messageArea {
+    overflow: auto;
+    position:fixed !important;
+    top:0;
+    right:0;
+    bottom: 47px;
+    left:0;
+    margin-left: 180px;
     padding: 7px 0 7px 10px;
+    background: rgb(40, 40, 40);
+    color: rgb(220, 220, 220);
 }
 
 #writeArea {
