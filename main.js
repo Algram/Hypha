@@ -2,6 +2,8 @@
 const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
+const Menu = electron.Menu;
+const Tray = electron.Tray;
 const irc = require('irc');
 const ipcMain = require('electron').ipcMain;
 const channels = require('./app/js/channels');
@@ -9,7 +11,7 @@ const channels = require('./app/js/channels');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
-
+let appIcon = null;
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
   // On OS X it is common for applications and their menu bar
@@ -22,17 +24,32 @@ app.on('window-all-closed', function() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', function() {
-  // Create the browser window.
-  mainWindow = new BrowserWindow({
-      width: 800,
-      height: 600,
-      frame: true,
-      x: 400,
-      y: 400,
-      minWidth: 500,
-      minHeight: 300,
-      overlayScrollbar: true
-  });
+// Initial createWindow
+  createWindow();
+
+
+  // Create a tray icon, GPL mock icon from http://www.iconarchive.com/show/captiva-icons-by-bokehlicia/chat-irc-icon.html
+  appIcon = new Tray('app/images/logo.png');
+  appIcon.setToolTip('IRClean');
+  let contextMenu = Menu.buildFromTemplate([
+    { label: 'Quit', click: function() { app.quit(); }}
+  ]);
+  appIcon.setContextMenu(contextMenu);
+
+
+  // Show and hide the application
+  appIcon.on('click', function() {
+
+    if (mainWindow != null && mainWindow.isVisible()) {
+      mainWindow.hide();
+    }
+    else if(mainWindow !== null && mainWindow.isVisible() == 0) {
+      mainWindow.show();
+    }
+   if(mainWindow == null) {
+    createWindow();
+  }
+});
 
   mainWindow.setMenu(null);
 
@@ -53,6 +70,21 @@ app.on('ready', function() {
   });
 });
 
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+      width: 800,
+      height: 600,
+      frame: true,
+      x: 400,
+      y: 400,
+      minWidth: 500,
+      minHeight: 300,
+      overlayScrollbar: true
+  });
+}
+
+
 function initializeIRC() {
     /*let config = {
     	channels: ["#dblabla", "#nonexistentas", "#linuxmasterrace"],
@@ -60,10 +92,11 @@ function initializeIRC() {
     	name: "testignoreme"
     };*/
 
+
     let config = {
-    	channels: ["#linuxmasterrace", "#supersecretproject"],
+    	channels: [],
     	server: "irc.snoonet.org",
-    	name: "Algram_"
+    	name: "_---_---_"
     };
 
     let client = new irc.Client(config.server, config.name, {
