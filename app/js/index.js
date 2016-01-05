@@ -44,10 +44,14 @@ $("#messageInput").keyup(function (e) {
 
         if (inputContent != '') {
             autocomplete(lastWord, function(name) {
-                inputContent = inputContent.substring(
+                let cachedContent = inputContent.substring(
                     0, inputContent.lastIndexOf(" "));
 
-                $("#messageInput").val(inputContent + name + ': ');
+                if (cachedContent == '') {
+                    $("#messageInput").val(name + ': ');
+                } else {
+                    $("#messageInput").val(cachedContent + ' ' + name);
+                }
             })
         }
     }
