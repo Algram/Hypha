@@ -79,9 +79,14 @@ line {
   display: flex;
 }
 
+timestamp {
+  width: 80px;
+  display: block;
+}
+
 nick {
   display: block;
-  width: 100px;
+  width: 120px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
