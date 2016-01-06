@@ -22,10 +22,24 @@ $("#messageInput").keydown(function (e) {
             }
 
             appendMessage(message);
-            $("#messageArea").animate({ scrollTop: $("#messageArea")[0].scrollHeight}, 0);
 
             $(this).val('');
             ipcRenderer.send('messageSent', message.message);
+        }
+    }
+});
+
+$("#usernameInput").keydown(function (e) {
+    if (e.keyCode == 13) {
+        let username = $(this).val();
+        console.log('pressed');
+
+        if (username != '') {
+            selectedChannel.username = username;
+
+            $("#usernameInput").val('');
+            $("#usernameInput").attr('placeholder', username);
+            ipcRenderer.send('setNewUsername', username);
         }
     }
 });
@@ -113,8 +127,6 @@ ipcRenderer.on('messageReceived', function(event, message) {
     if (pattern.test(message.message)) {
         doNotify(selectedChannel.name + ' ' + message.from, message.message);
     }
-
-    $("#messageArea").animate({ scrollTop: $("#messageArea")[0].scrollHeight}, 0);
 });
 
 

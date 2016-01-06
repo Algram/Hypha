@@ -129,3 +129,24 @@ exports.getMessagesOfChannel = function(name, callback) {
     // Return this object reference to allow for method chaining.
     return(this);
 };
+
+exports.setChannelUsername = function(channelname, username, callback) {
+    // Make sure a callback is defined.
+    callback = (callback || noop);
+    console.log('in', channelname);
+    // Create the new channel instance.
+    for (let key in channels) {
+        let channel = channels[key];
+
+        if (channel.name == channelname) {
+
+            channel.username = username;
+
+            // Pass the channel to the callback (the calling context).
+            callback(channel);
+        }
+    }
+
+    // Return this object reference to allow for method chaining.
+    return(this);
+};

@@ -87,18 +87,18 @@ function createWindow() {
 
 
 function initializeIRC() {
-    /*let config = {
-     	channels: ["#supersecretproject"],
-     	server: "irc.freenode.net",
-     	name: "hel1oworld"
-    };*/
-
-
     let config = {
+     	channels: ["#linuxmasterrace"],
+     	server: "irc.freenode.net",
+     	name: "hel1oworld1123"
+    };
+
+
+    /*let config = {
     	channels: ["#supersecretproject", "#linuxmasterrace"],
     	server: "irc.snoonet.org",
     	name: "Testgram"
-    };
+    };*/
 
 
     let client = new irc.Client(config.server, config.name, {
@@ -163,6 +163,7 @@ function initializeIRC() {
 
     ipcMain.on('messageSent', function(event, messageContent) {
         channels.getSelectedChannel(function(channel) {
+            console.log(channel.username);
             let message = {
                 from: channel.username,
                 to: channel.name,
@@ -191,6 +192,16 @@ function initializeIRC() {
                 event.sender.send('channelSelected_reply', channel);
             })
         });
+    });
+
+    ipcMain.on('setNewUsername', function(event, username) {
+        channels.getSelectedChannel(function(channel) {
+            channels.setChannelUsername(channel.name, username, function(r) {
+                console.log(r.username);
+            });
+        });
+
+        client.send('NICK', username);
     });
 
     ipcMain.on('closeWindow', function(event) {
