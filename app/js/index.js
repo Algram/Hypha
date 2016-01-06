@@ -5,7 +5,7 @@ const shell = require('electron').shell;
 
 let channels2 = [];
 let selectedChannel;
-let userName;
+
 jQuery.fn.reverse = function() {
     return this.pushStack(this.get().reverse(), arguments);
 };
@@ -16,7 +16,7 @@ $("#messageInput").keyup(function (e) {
 
         if (messageContent != '') {
             let message = {
-                from: userName,
+                from: selectedChannel.username,
                 to: null,
                 message: messageContent
             }
@@ -89,8 +89,6 @@ $('#titlebar').on('click', 'close', function(e) {
 //////////////////////
 
 ipcRenderer.on('channelData', function(event, nick, channelName, channelUsers) {
-    userName = nick;
-
     if (channels2.indexOf(channelName) == -1) {
         channels2.push(channelName);
         let line = '<li>' + channelName + '</li>';
@@ -124,6 +122,7 @@ ipcRenderer.on('channelSelected_reply', function(event, channel) {
     selectedChannel = channel;
     let messages = channel.messages;
 
+    $('#usernameInput').attr('placeholder', selectedChannel.username);
     $('#messageArea').empty();
 
     for (let key in messages) {

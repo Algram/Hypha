@@ -146,16 +146,16 @@ message {
 }
 
 #writeArea {
+    display: flex;
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 7px 20px 7px 7px;
+    padding: 7px;
     background: rgb(60, 60, 60);
 }
 
 #writeArea input {
-    width: 100%;
     display: block;
     font-family: sans-serif;
     font-size: 18px;
@@ -169,6 +169,20 @@ message {
 
 #writeArea input:focus {
     outline: none;
+}
+
+#usernameInput {
+    width: 100px;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+#messageInput {
+    width: 100%;
+}
+
+#usernameInput + #messageInput {
+    border-left-width: 0;
 }
 
 ::-webkit-scrollbar-corner {
