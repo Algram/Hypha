@@ -18,13 +18,47 @@ a:hover {
     -webkit-app-region: drag;
     height: 40px;
     width: 100%;
-    background: #000;
+    background: rgb(30, 30, 30);
+}
+
+close {
+    display: inline-block;
+    float: right;
+    width: 40px;
+    height: 40px;
+    color: rgb(180, 180, 180);
+    line-height: 40px;
+    text-align: center;
+    vertical-align: center;
+    background: rgb(20, 20, 20);
+    -webkit-app-region: no-drag;
+}
+
+close:hover {
+    background: rgb(10, 10, 10);
+}
+
+add {
+    display: inline-block;
+    float: left;
+    width: 40px;
+    height: 40px;
+    color: rgb(180, 180, 180);
+    line-height: 40px;
+    text-align: center;
+    vertical-align: center;
+    background: rgb(20, 20, 20);
+    -webkit-app-region: no-drag;
+}
+
+add:hover {
+    background: rgb(10, 10, 10);
 }
 
 #content {
     overflow: auto;
     position:fixed !important;
-    top:0;
+    top:40px;
     right:0;
     bottom:0;
     left:0;
@@ -36,7 +70,7 @@ a:hover {
 
 #channelList {
     position: absolute;
-    top: 0;
+    top: 40px;
     bottom: 0;
     width: 179px;
     color: #fff;
@@ -101,7 +135,7 @@ message {
 #messageArea {
     overflow: auto;
     position:fixed !important;
-    top: 3px;
+    top: 43px;
     right:0;
     bottom: 50px;
     left:0;

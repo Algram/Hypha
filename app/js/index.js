@@ -78,6 +78,10 @@ $('#messageArea').on('click', 'a', function(e) {
     }
 })
 
+$('#titlebar').on('click', 'close', function(e) {
+    e.preventDefault();
+    ipcRenderer.send('closeWindow');
+})
 
 
 //////////////////////
