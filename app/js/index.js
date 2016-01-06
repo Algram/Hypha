@@ -10,7 +10,7 @@ jQuery.fn.reverse = function() {
     return this.pushStack(this.get().reverse(), arguments);
 };
 
-$("#messageInput").keyup(function (e) {
+$("#messageInput").keydown(function (e) {
     if (e.keyCode == 13) {
         let messageContent = $(this).val();
 
@@ -30,13 +30,13 @@ $("#messageInput").keyup(function (e) {
     }
 });
 
-$("#messageInput").keydown(function (e) {
+$("#messageInput").keyup(function (e) {
     if (e.keyCode == 9) {
         e.preventDefault();
     }
 });
 
-$("#messageInput").keyup(function (e) {
+$("#messageInput").keydown(function (e) {
     if (e.keyCode == 9) {
         e.preventDefault();
 
@@ -129,6 +129,8 @@ ipcRenderer.on('channelSelected_reply', function(event, channel) {
         let message = messages[key];
         appendMessage(message);
     }
+
+    fillUsermenu(channel.users);
 });
 
 function appendMessage(message) {
@@ -171,6 +173,8 @@ function appendMessage(message) {
 
         $('#messageArea line:last message').html(insertStr);
     }
+
+    $("#messageArea").animate({ scrollTop: $("#messageArea")[0].scrollHeight}, 0);
 }
 
 function findLinks(str) {
@@ -219,6 +223,20 @@ function autocomplete(str, callback) {
         if(user.indexOf(str) == 0) {
             callback(user);
         }
+    }
+}
+
+function fillUsermenu(usersObj) {
+    $('usermenu users').empty();
+
+    let users = Object.keys(usersObj);
+
+    for (let key in users) {
+        let user = users[key];
+        user = user.split(':')[0];
+        console.log(user);
+
+        $('usermenu users').append('<user>' + user + '</user>');
     }
 }
 

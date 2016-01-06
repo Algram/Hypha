@@ -95,9 +95,9 @@ function initializeIRC() {
 
 
     let config = {
-    	channels: ["#supersecretproject"],
+    	channels: ["#supersecretproject", "#linuxmasterrace"],
     	server: "irc.snoonet.org",
-    	name: "Helloworld19"
+    	name: "Testgram"
     };
 
 
