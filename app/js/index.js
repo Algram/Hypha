@@ -39,7 +39,7 @@ $("#usernameInput").keydown(function (e) {
 
             $("#usernameInput").val('');
             $("#usernameInput").attr('placeholder', username);
-            ipcRenderer.send('setNewUsername', username);
+            ipcRenderer.send('usernameChanged', username);
         }
     }
 });
@@ -147,7 +147,6 @@ ipcRenderer.on('channelSelected_reply', function(event, channel, username) {
 
 function appendMessage(message) {
     let nick = message.from;
-    console.log(message);
 
     //Remove nick if message before was sent by the same nick
     if (!lastNicksUnique(nick)) {
@@ -231,7 +230,7 @@ function lastNicksUnique(nextNick) {
 }
 
 function autocomplete(str, callback) {
-    let users = Object.keys(selectedChannel.users);
+    let users = Object.keys(selectedChannel.users[0]);
 
     for (let key in users) {
         let user = users[key];
@@ -261,7 +260,7 @@ function doNotify(title, body) {
     let options = {
         title: title,
         body: body,
-        icon: path.join(__dirname, 'icon.png')
+        icon: path.join(__dirname, '../images/icon.png')
     };
 
     new Notification(options.title, options);

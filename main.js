@@ -86,6 +86,14 @@ function addClient(name, address) {
         mainWindow.webContents.send('messageReceived', message);
     })
 
+    client.on('action', function(data) {
+
+    })
+
+    client.on('event', function(data) {
+        mainWindow.webContents.send('event', data);
+    })
+
 
     //////////////////////
     // Receiving Events //
@@ -120,6 +128,20 @@ function addClient(name, address) {
         client.setSelectedChannel(selChannel)
 
         event.sender.send('channelSelected_reply', selChannel, client.getNick());
+    });
+
+    /*
+    The username in the renderer got changes, update the client module
+    accordingly and send the name-change command to the server
+     */
+    ipcMain.on('usernameChanged', function(event, username) {
+        channels.getSelectedChannel(function(channel) {
+            channels.setChannelUsername(channel.name, username, function(r) {
+                console.log(r.username);
+            });
+        });
+
+        client.send('NICK', username);
     });
 
     client.addChannel('#linuxmasterracecirclejerk');

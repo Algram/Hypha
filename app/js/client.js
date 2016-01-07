@@ -124,6 +124,44 @@ class Client {
             }
         });
 
+        this.client.addListener('join', (channel, nick, message) => {
+            console.log(channel, nick, message);
+
+            let data = {
+                channel: channel,
+                nick: nick,
+                message: message
+            }
+
+            this.emit('event', data);
+        });
+
+        this.client.addListener('part', (channel, nick, reason, message) => {
+            console.log(channel, nick, reason, message);
+
+            let data = {
+                channel: channel,
+                nick: nick,
+                reason: reason,
+                message: message
+            }
+
+            this.emit('event', data);
+        });
+
+        this.client.addListener('quit', (nick, reason, channels, message) => {
+            console.log(nick, reason, channels, message);
+
+            let data = {
+                channels: channels,
+                nick: nick,
+                reason: reason,
+                message: message
+            }
+
+            this.emit('event', data);
+        });
+
         /*
         Listening to errors, otherwise the program will exit on error
          */
