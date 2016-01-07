@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 class Channel {
     constructor(name) {
@@ -25,9 +25,6 @@ class Channel {
 
     getMessages() {
         return this.messages;
-
-        // Return this object reference to allow for method chaining.
-        return(this);
     }
 
     getName() {
@@ -35,4 +32,4 @@ class Channel {
     }
 }
 
-exports.Channel = Channel
+exports.Channel = Channel;

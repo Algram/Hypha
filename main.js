@@ -38,13 +38,13 @@ app.on('ready', function() {
   // Show and hide the application
   appIcon.on('click', function() {
 
-    if (mainWindow != null && mainWindow.isVisible()) {
+    if (mainWindow !== null && mainWindow.isVisible()) {
       mainWindow.hide();
     }
-    else if(mainWindow !== null && mainWindow.isVisible() == 0) {
+    else if(mainWindow !== null && mainWindow.isVisible() === 0) {
       mainWindow.show();
     }
-   if(mainWindow == null) {
+   if(mainWindow === null) {
     createWindow();
   }
 });
@@ -125,7 +125,7 @@ function addClient(name, address) {
      */
     ipcMain.on('channelSelected', function(event, name) {
         let selChannel = client.getChannel(name);
-        client.setSelectedChannel(selChannel)
+        client.setSelectedChannel(selChannel);
 
         event.sender.send('channelSelected_reply', selChannel, client.getNick());
     });
@@ -135,11 +135,11 @@ function addClient(name, address) {
     accordingly and send the name-change command to the server
      */
     ipcMain.on('usernameChanged', function(event, username) {
-        channels.getSelectedChannel(function(channel) {
+        /*channels.getSelectedChannel(function(channel) {
             channels.setChannelUsername(channel.name, username, function(r) {
                 console.log(r.username);
             });
-        });
+        });*/
 
         client.send('NICK', username);
     });

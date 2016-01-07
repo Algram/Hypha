@@ -14,7 +14,7 @@ $("#messageInput").keydown(function (e) {
     if (e.keyCode == 13) {
         let messageContent = $(this).val();
 
-        if (messageContent != '') {
+        if (messageContent !== '') {
             let message = {
                 from: selectedUsername,
                 to: selectedChannel.name,
@@ -34,7 +34,7 @@ $("#usernameInput").keydown(function (e) {
         let username = $(this).val();
         console.log('pressed');
 
-        if (username != '') {
+        if (username !== '') {
             selectedUsername = username;
 
             $("#usernameInput").val('');
@@ -57,12 +57,12 @@ $("#messageInput").keydown(function (e) {
         let inputContent = $(this).val();
         let lastWord = inputContent.split(' ').pop();
 
-        if (inputContent != '') {
+        if (inputContent !== '') {
             autocomplete(lastWord, function(name) {
                 let cachedContent = inputContent.substring(
                     0, inputContent.lastIndexOf(" "));
 
-                if (cachedContent == '') {
+                if (cachedContent === '') {
                     $("#messageInput").val(name + ': ');
                 } else {
                     $("#messageInput").val(cachedContent + ' ' + name);
@@ -172,7 +172,7 @@ function appendMessage(message) {
 
     //Check if message contains links
     let links = findLinks(messageEnc);
-    if (links != null) {
+    if (links !== null) {
         let insertStr = messageEnc;
 
         for (let key in links) {
@@ -212,7 +212,7 @@ function lastNicksUnique(nextNick) {
     $(lastNicks).reverse().each(function() {
         iteratedNicks.push($(this).text());
 
-        if ($(this).text() != '') {
+        if ($(this).text() !== '') {
             return false;
         }
     })
@@ -221,7 +221,7 @@ function lastNicksUnique(nextNick) {
         let nick = iteratedNicks[key];
         if (nick != nextNick) {
             unique = true;
-        } else if (nick == '' || nick == nextNick) {
+        } else if (nick === '' || nick == nextNick) {
             unique = false;
             break;
         }
@@ -238,7 +238,7 @@ function autocomplete(str, callback) {
         user = user.split(':')[0];
 
         //Check if str is the start of user
-        if(user.indexOf(str) == 0) {
+        if(user.indexOf(str) === 0) {
             callback(user);
         }
     }

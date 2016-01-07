@@ -1,7 +1,7 @@
-'use strict'
+'use strict';
 const channel = require('./channel');
 const irc = require('irc');
-const util = require('util')
+const util = require('util');
 const events = require('events');
 
 class Client {
@@ -9,7 +9,7 @@ class Client {
         this.nick = nick;
         this.address = address;
         this.channels = [];
-        this.selectedChannel;
+        this.selectedChannel = '';
 
         this.client = new irc.Client(address, nick, {
         	autoConnect: false
@@ -36,7 +36,7 @@ class Client {
             if (channel.getName() == name) {
                 return channel;
             }
-        };
+        }
 
         // Return this object reference to allow for method chaining.
         return(this);
@@ -51,16 +51,10 @@ class Client {
 
     getSelectedChannel() {
         return this.selectedChannel;
-
-        // Return this object reference to allow for method chaining.
-        return(this);
     }
 
     getNick(name) {
         return this.nick;
-
-        // Return this object reference to allow for method chaining.
-        return(this);
     }
 
     say(channel, message) {
@@ -74,7 +68,7 @@ class Client {
         client.connect(function() {
             for (let key in channels) {
                 let channel = channels[key];
-                client.join(channel.getName())
+                client.join(channel.getName());
             }
         });
     }
@@ -171,5 +165,5 @@ class Client {
     }
 }
 
-util.inherits(Client, events)
+util.inherits(Client, events);
 exports.Client = Client;
