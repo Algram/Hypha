@@ -3,21 +3,21 @@ const ipcRenderer = require('electron').ipcRenderer;
 const path = require('path');
 const shell = require('electron').shell;
 
-let channels2 = [];
+let displayedChannels = [];
 let selectedChannel;
+let selectedUsername = '';
 
-jQuery.fn.reverse = function() {
-    return this.pushStack(this.get().reverse(), arguments);
-};
-
+/*
+New message needs to be sent to main process
+ */
 $("#messageInput").keydown(function (e) {
     if (e.keyCode == 13) {
         let messageContent = $(this).val();
 
         if (messageContent != '') {
             let message = {
-                from: selectedChannel.username,
-                to: null,
+                from: selectedUsername,
+                to: selectedChannel.name,
                 message: messageContent
             }
 
@@ -35,7 +35,7 @@ $("#usernameInput").keydown(function (e) {
         console.log('pressed');
 
         if (username != '') {
-            selectedChannel.username = username;
+            selectedUsername = username;
 
             $("#usernameInput").val('');
             $("#usernameInput").attr('placeholder', username);
@@ -79,12 +79,16 @@ $('#channelList').on('click', 'li', function(e) {
     $(this).removeClass('unread');
     $(this).addClass('selected');
 
+    //Need to change that to check for corresponding server too
+    //otherwise there will be problem with same names on different
+    //servers
     ipcRenderer.send('channelSelected', $(this).text());
 })
 
 $('#messageArea').on('click', 'a', function(e) {
     e.preventDefault();
 
+    //Check if "http://" is there and add it if necessary
     if ($(this).text().match(/^[^/]+:\/\//)) {
         shell.openExternal($(this).text());
     } else {
@@ -102,10 +106,11 @@ $('#titlebar').on('click', 'close', function(e) {
 // Receiving Events //
 //////////////////////
 
-ipcRenderer.on('channelData', function(event, nick, channelName, channelUsers) {
-    if (channels2.indexOf(channelName) == -1) {
-        channels2.push(channelName);
-        let line = '<li>' + channelName + '</li>';
+//CLEANUP
+ipcRenderer.on('channelData', function(event, channel) {
+    if (displayedChannels.indexOf(channel.name) == -1) {
+        displayedChannels.push(channel.name);
+        let line = '<li>' + channel.name + '</li>';
         $('#channelList ul').append(line);
     }
 });
@@ -121,20 +126,15 @@ ipcRenderer.on('messageReceived', function(event, message) {
 
         $(affectedChannel).addClass('unread');
     }
-
-    //Check if username is mentioned somewhere in the message
-    let pattern = new RegExp('\\b' + selectedChannel.username + '\\b', 'ig');
-    if (pattern.test(message.message)) {
-        doNotify(selectedChannel.name + ' ' + message.from, message.message);
-    }
 });
 
-
-ipcRenderer.on('channelSelected_reply', function(event, channel) {
+ipcRenderer.on('channelSelected_reply', function(event, channel, username) {
     selectedChannel = channel;
+    selectedUsername = username;
+
     let messages = channel.messages;
 
-    $('#usernameInput').attr('placeholder', selectedChannel.username);
+    $('#usernameInput').attr('placeholder', selectedUsername);
     $('#messageArea').empty();
 
     for (let key in messages) {
@@ -147,6 +147,7 @@ ipcRenderer.on('channelSelected_reply', function(event, channel) {
 
 function appendMessage(message) {
     let nick = message.from;
+    console.log(message);
 
     //Remove nick if message before was sent by the same nick
     if (!lastNicksUnique(nick)) {
@@ -163,9 +164,10 @@ function appendMessage(message) {
     $('#messageArea').append(line);
 
     //Check if username is mentioned somewhere in the message
-    let pattern = new RegExp('\\b' + selectedChannel.username + '\\b', 'ig');
+    let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
     if (pattern.test(message.message)) {
         $('#messageArea line:last message').addClass('highlighted');
+        doNotify(selectedChannel.name + ' ' + message.from, message.message);
     }
 
     //Check if message contains links
@@ -186,9 +188,13 @@ function appendMessage(message) {
         $('#messageArea line:last message').html(insertStr);
     }
 
+    //Scroll to last appended message
     $("#messageArea").animate({ scrollTop: $("#messageArea")[0].scrollHeight}, 0);
 }
 
+/*
+This uses a permissive regex to find urls in a string
+ */
 function findLinks(str) {
     let pattern = /\b(?:[a-z]{2,}?:\/\/)?[^\s/]+\.\w{2,}(?::\d{1,5})?(?:\/[^\s]*\b|\b)(?![:.?#]\S)/gi;
 
@@ -246,7 +252,6 @@ function fillUsermenu(usersObj) {
     for (let key in users) {
         let user = users[key];
         user = user.split(':')[0];
-        console.log(user);
 
         $('usermenu users').append('<user>' + user + '</user>');
     }
@@ -268,4 +273,8 @@ String.prototype.insert = function (index, string) {
     return this.substring(0, index) + string + this.substring(index, this.length);
   else
     return string + this;
+};
+
+jQuery.fn.reverse = function() {
+    return this.pushStack(this.get().reverse(), arguments);
 };

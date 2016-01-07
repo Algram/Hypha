@@ -4,9 +4,8 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const Menu = electron.Menu;
 const Tray = electron.Tray;
-const irc = require('irc');
 const ipcMain = require('electron').ipcMain;
-const channels = require('./app/js/channels');
+const irc = require('./app/js/client');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,7 +25,6 @@ app.on('window-all-closed', function() {
 app.on('ready', function() {
 // Initial createWindow
   createWindow();
-
 
   // Create a tray icon, GPL mock icon from http://www.iconarchive.com/show/captiva-icons-by-bokehlicia/chat-irc-icon.html
   appIcon = new Tray('app/images/logo.png');
@@ -56,7 +54,9 @@ app.on('ready', function() {
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/app/index.html');
 
-  initializeIRC();
+    addClient('testignoreme', 'irc.snoonet.org');
+
+  //initializeIRC();
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
@@ -68,8 +68,65 @@ app.on('ready', function() {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
+  ipcMain.on('closeWindow', function(event) {
+      mainWindow.close();
+  });
 });
 
+
+function addClient(name, address) {
+    let client = new irc.Client(name, address);
+
+    client.on('channelData', function(channel) {
+        mainWindow.webContents.send('channelData', channel);
+    })
+
+    client.on('messageReceived', function(message) {
+        mainWindow.webContents.send('messageReceived', message);
+    })
+
+
+    //////////////////////
+    // Receiving Events //
+    //////////////////////
+
+    /*
+    They renderer wants to send a message and fires the event for it
+    that contains the message content
+     */
+    ipcMain.on('messageSent', function(event, messageContent) {
+        let selChannel = client.getSelectedChannel();
+
+        let message = {
+            from: client.getNick(),
+            to: selChannel.getName(),
+            message: messageContent
+        }
+
+        //Add message to selected channel
+        selChannel.addMessage(message);
+
+        //Tell the client to send the message to its channel
+        client.say(message.to, message.message);
+    });
+
+    /*
+    In the renderer a channel got selected and the event contains
+    the name of the selected channel
+     */
+    ipcMain.on('channelSelected', function(event, name) {
+        let selChannel = client.getChannel(name);
+        client.setSelectedChannel(selChannel)
+
+        event.sender.send('channelSelected_reply', selChannel, client.getNick());
+    });
+
+    client.addChannel('#linuxmasterracecirclejerk');
+    client.addChannel('#supersecretproject');
+
+    client.connect();
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -86,114 +143,7 @@ function createWindow() {
 }
 
 
-function initializeIRC() {
-    let config = {
-     	channels: ["#linuxmasterrace"],
-     	server: "irc.freenode.net",
-     	name: "hel1oworld1123"
-    };
-
-
-    /*let config = {
-    	channels: ["#supersecretproject", "#linuxmasterrace"],
-    	server: "irc.snoonet.org",
-    	name: "Testgram"
-    };*/
-
-
-    let client = new irc.Client(config.server, config.name, {
-    	channels: config.channels
-    });
-
-    /*
-    This event happens everytime the client connects to a channel
-    If it is successful, all the channel-data is provided
-     */
-    client.addListener('names', function(channel, nicks) {
-        let availChannels = client.chans;
-        let nick = client.nick;
-
-        for (let key in availChannels) {
-            let channel = availChannels[key];
-            let channelName = channel.serverName;
-            let channelUsers = channel.users;
-
-            //Add the channel to the channels module
-            channels.addChannel(channelName, nick, channelUsers);
-
-            //Tell the renderer that channel data was received and send it over
-            mainWindow.webContents.send(
-                'channelData', nick, channelName, channelUsers);
-        }
-    });
-
-    /*
-    This event gets fired when the client receives a new message
-     */
-    client.addListener('message', function (from, to, messageContent) {
-        let message = {
-            from: from,
-            to: to,
-            message: messageContent
-        }
-
-        //Add the message to the channel object
-        channels.addMessageToChannel(message.to, message);
-
-        //Tell the renderer that a message was received and send it over
-        mainWindow.webContents.send('messageReceived', message);
-    });
-
-    /*
-    Listening to errors, otherwise the program will exit on error
-     */
-    client.addListener('error', function(message) {
-        console.log('error: ', message);
-    });
-
-
-    //////////////////////
-    // Receiving Events //
-    //////////////////////
-
-    /*
-    They renderer wants to send a message and fires the event for it
-    that contains the message content
-     */
-
-    ipcMain.on('messageSent', function(event, messageContent) {
-        channels.getSelectedChannel(function(channel) {
-            console.log(channel.username);
-            let message = {
-                from: channel.username,
-                to: channel.name,
-                message: messageContent
-            }
-
-            //Add the message to the appropriate channel
-            channels.addMessageToChannel(message.to, message);
-
-            //Tell the client to send the message to its channel
-            client.say(message.to, message.message);
-        })
-    });
-
-    /*
-    In the renderer a channel got selected and the event contains
-    the name of the selected channel
-     */
-    ipcMain.on('channelSelected', function(event, arg) {
-        channels.setSelectedChannel(arg, function(r) {
-            /*channels.getMessagesOfChannel(r.name, function(messages) {
-                event.sender.send('channelSelected_reply', messages);
-            })*/
-
-            channels.getSelectedChannel(function(channel) {
-                event.sender.send('channelSelected_reply', channel);
-            })
-        });
-    });
-
+/*function initializeIRC() {
     ipcMain.on('setNewUsername', function(event, username) {
         channels.getSelectedChannel(function(channel) {
             channels.setChannelUsername(channel.name, username, function(r) {
@@ -203,22 +153,4 @@ function initializeIRC() {
 
         client.send('NICK', username);
     });
-
-    ipcMain.on('closeWindow', function(event) {
-        mainWindow.close();
-    });
-
-
-    /*client.addListener('registered', function(message) {
-        setTimeout(function () {
-            client.say('#supersecretproject', "test");
-        }, 4000);
-    });
-
-    client.addListener('topic', function(channel, nicks) {
-        console.log('names: ', nicks);
-
-
-        //event.sender.send('messageSent', 'message received');
-    });*/
-}
+}*/
