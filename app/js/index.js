@@ -147,6 +147,7 @@ ipcRenderer.on('channelSelected_reply', function(event, channel, username) {
 
 function appendMessage(message) {
     let nick = message.from;
+    let messageEnc = encodeEntities(message.message);
 
     //Remove nick if message before was sent by the same nick
     if (!lastNicksUnique(nick)) {
@@ -157,22 +158,22 @@ function appendMessage(message) {
         '</timestamp><nick>' + nick + '</nick><message>' +
         message.message + '</message></line>';*/
 
-    let line = '<line><nick>' + nick + '</nick><message>' + message.message + '</message></line>';
+    let line = '<line><nick>' + nick + '</nick><message>' + messageEnc + '</message></line>';
 
 
     $('#messageArea').append(line);
 
     //Check if username is mentioned somewhere in the message
     let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
-    if (pattern.test(message.message)) {
+    if (pattern.test(messageEnc)) {
         $('#messageArea line:last message').addClass('highlighted');
-        doNotify(selectedChannel.name + ' ' + message.from, message.message);
+        doNotify(selectedChannel.name + ' ' + message.from, messageEnc);
     }
 
     //Check if message contains links
-    let links = findLinks(message.message);
+    let links = findLinks(messageEnc);
     if (links != null) {
-        let insertStr = message.message;
+        let insertStr = messageEnc;
 
         for (let key in links) {
             let link = links[key];
@@ -266,6 +267,31 @@ function doNotify(title, body) {
     new Notification(options.title, options);
 }
 
+/**
+ * Escapes all potentially dangerous characters, so that the
+ * resulting string can be safely inserted into attribute or
+ * element text.
+ * @param value
+ * @returns {string} escaped text
+ */
+function encodeEntities(value) {
+    let surrogate_pair_regexp = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
+    // Match everything outside of normal chars and " (quote character)
+    let non_alphanumeric_regexp = /([^\#-~| |!])/g;
+
+    return value.
+        replace(/&/g, '&amp;').
+        replace(surrogate_pair_regexp, function(value) {
+            var hi = value.charCodeAt(0);
+            var low = value.charCodeAt(1);
+            return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
+        }).
+        replace(non_alphanumeric_regexp, function(value) {
+            return '&#' + value.charCodeAt(0) + ';';
+        }).
+        replace(/</g, '&lt;').
+        replace(/>/g, '&gt;');
+}
 
 String.prototype.insert = function (index, string) {
   if (index > 0)
