@@ -54,7 +54,7 @@ app.on('ready', function() {
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/app/index.html');
 
-    addClient('testignoreme', 'irc.snoonet.org');
+    addClient('Testgram', 'irc.snoonet.org');
 
   //initializeIRC();
 
@@ -84,14 +84,12 @@ function addClient(name, address) {
 
     client.on('messageReceived', function(message) {
         mainWindow.webContents.send('messageReceived', message);
-    })
 
-    client.on('action', function(data) {
+        if (message.event === true) {
+            let channel = client.getChannel(message.to);
 
-    })
-
-    client.on('event', function(data) {
-        mainWindow.webContents.send('event', data);
+            mainWindow.webContents.send('userlistChanged', channel.getUsers());
+        }
     })
 
 
@@ -109,7 +107,9 @@ function addClient(name, address) {
         let message = {
             from: client.getNick(),
             to: selChannel.getName(),
-            message: messageContent
+            message: messageContent,
+            event: false,
+            action: false
         }
 
         //Add message to selected channel
@@ -144,7 +144,7 @@ function addClient(name, address) {
         client.send('NICK', username);
     });
 
-    client.addChannel('#linuxmasterracecirclejerk');
+    client.addChannel('#linuxmasterrace');
     client.addChannel('#supersecretproject');
 
     client.connect();

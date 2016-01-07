@@ -116,18 +116,31 @@ ipcRenderer.on('channelData', function(event, channel) {
 });
 
 ipcRenderer.on('messageReceived', function(event, message) {
-    //If message is to currently selected channel, display it there
-    if (message.to == selectedChannel.name) {
-        appendMessage(message);
-    } else {
-        let affectedChannel = $("#channelList li").filter(function() {
-            return ($(this).text() === message.to)
-        });
+    if (message.event === false && message.action === false) {
+        //If message is to currently selected channel, display it there
+        if (message.to == selectedChannel.name) {
+            appendMessage(message);
+        } else {
+            let affectedChannel = $("#channelList li").filter(function() {
+                return ($(this).text() === message.to)
+            });
 
-        $(affectedChannel).addClass('unread');
+            $(affectedChannel).addClass('unread');
+        }
+
+        //Check if username is mentioned somewhere in the message
+        let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
+        if (pattern.test(message.message)) {
+            doNotify(selectedChannel.name + ' ' + message.from, message.message);
+        }
+
+    } else if (message.event === true) {
+        //This message is an event
+        appendEvent(message);
     }
 });
 
+//CLEANUP code dupe with mesageReceived
 ipcRenderer.on('channelSelected_reply', function(event, channel, username) {
     selectedChannel = channel;
     selectedUsername = username;
@@ -139,10 +152,19 @@ ipcRenderer.on('channelSelected_reply', function(event, channel, username) {
 
     for (let key in messages) {
         let message = messages[key];
-        appendMessage(message);
+        if (message.event === false && message.action === false) {
+            appendMessage(message);
+        } else if (message.event === true) {
+            //This message is an event
+            appendEvent(message);
+        }
     }
 
     fillUsermenu(channel.users);
+});
+
+ipcRenderer.on('userlistChanged', function(event, users) {
+    console.log(users);
 });
 
 function appendMessage(message) {
@@ -167,7 +189,6 @@ function appendMessage(message) {
     let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
     if (pattern.test(messageEnc)) {
         $('#messageArea line:last message').addClass('highlighted');
-        doNotify(selectedChannel.name + ' ' + message.from, messageEnc);
     }
 
     //Check if message contains links
@@ -190,6 +211,11 @@ function appendMessage(message) {
 
     //Scroll to last appended message
     $("#messageArea").animate({ scrollTop: $("#messageArea")[0].scrollHeight}, 0);
+}
+
+function appendEvent(message) {
+    let line = '<line><event>' + message.message + '</event></line>';
+    $('#messageArea').append(line)
 }
 
 /*

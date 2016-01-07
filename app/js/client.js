@@ -104,7 +104,9 @@ class Client {
             let message = {
                 from: from,
                 to: to,
-                message: messageContent
+                message: messageContent,
+                event: false,
+                action: false
             }
 
             for (let key in this.channels) {
@@ -118,42 +120,61 @@ class Client {
             }
         });
 
-        this.client.addListener('join', (channel, nick, message) => {
-            console.log(channel, nick, message);
+        this.client.addListener('join', (channelName, nick, messageObj) => {
+            //Filter out own join message
+            if (nick !== this.nick) {
+                let channel = this.getChannel(channelName);
 
-            let data = {
-                channel: channel,
-                nick: nick,
-                message: message
+                let message = {
+                    from: nick,
+                    to: channelName,
+                    message: nick + ' joined.',
+                    event: true,
+                    action: false
+                }
+
+                channel.addUser(nick);
+                channel.addMessage(message);
+
+                this.emit('messageReceived', message);
             }
-
-            this.emit('event', data);
         });
 
-        this.client.addListener('part', (channel, nick, reason, message) => {
-            console.log(channel, nick, reason, message);
+        this.client.addListener('part', (channelName, nick, reason, messageObj) => {
+            let channel = this.getChannel(channelName);
 
-            let data = {
-                channel: channel,
-                nick: nick,
-                reason: reason,
-                message: message
+            let message = {
+                from: nick,
+                to: channelName,
+                message: nick + ' left. ' + '(' + reason + ')',
+                event: true,
+                action: false
             }
 
-            this.emit('event', data);
+            channel.removeUser(nick);
+            channel.addMessage(message);
+
+            this.emit('messageReceived', message);
         });
 
-        this.client.addListener('quit', (nick, reason, channels, message) => {
-            console.log(nick, reason, channels, message);
+        this.client.addListener('quit', (nick, reason, channels, messageObj) => {
+            for (let key in this.channels) {
+                let channel = this.channels[key];
 
-            let data = {
-                channels: channels,
-                nick: nick,
-                reason: reason,
-                message: message
+                //Add this message to every channel
+                let message = {
+                    from: nick,
+                    to: channel.getName(),
+                    message: nick + ' quit. ' + '(' + reason + ')',
+                    event: true,
+                    action: false
+                }
+
+                channel.removeUser(nick);
+                channel.addMessage(message);
+
+                this.emit('messageReceived', message);
             }
-
-            this.emit('event', data);
         });
 
         /*
