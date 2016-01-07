@@ -157,6 +157,8 @@ class Client {
             this.emit('messageReceived', message);
         });
 
+        //BUGFIX atm get's added to every open channel, even if person
+        //wasn't in that
         this.client.addListener('quit', (nick, reason, channels, messageObj) => {
             for (let key in this.channels) {
                 let channel = this.channels[key];

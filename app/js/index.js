@@ -21,9 +21,9 @@ $("#messageInput").keydown(function (e) {
                 message: messageContent
             }
 
-            appendMessage(message);
-
             $(this).val('');
+
+            appendMessage(message);
             ipcRenderer.send('messageSent', message.message);
         }
     }
@@ -106,21 +106,24 @@ $('#titlebar').on('click', 'close', function(e) {
 // Receiving Events //
 //////////////////////
 
-//CLEANUP
 ipcRenderer.on('channelData', function(event, channel) {
     if (displayedChannels.indexOf(channel.name) == -1) {
         displayedChannels.push(channel.name);
+
+        //Add channel-item to channelList, refactor to also add server-item
         let line = '<li>' + channel.name + '</li>';
         $('#channelList ul').append(line);
+
+        //Add channel-tag to messageArea, refactor to also add server-tag
+        let cleanName = channel.name.substr(1);
+        $('#messageArea').append('<' + cleanName + '>' + '</' + cleanName + '>');
     }
 });
 
 ipcRenderer.on('messageReceived', function(event, message) {
     if (message.event === false && message.action === false) {
-        //If message is to currently selected channel, display it there
-        if (message.to == selectedChannel.name) {
-            appendMessage(message);
-        } else {
+        //Mark as unread if not in selectedChannel
+        if (message.to !== selectedChannel.name) {
             let affectedChannel = $("#channelList li").filter(function() {
                 return ($(this).text() === message.to)
             });
@@ -134,31 +137,23 @@ ipcRenderer.on('messageReceived', function(event, message) {
             doNotify(selectedChannel.name + ' ' + message.from, message.message);
         }
 
+        appendMessage(message);
+
     } else if (message.event === true) {
         //This message is an event
         appendEvent(message);
     }
 });
 
-//CLEANUP code dupe with mesageReceived
 ipcRenderer.on('channelSelected_reply', function(event, channel, username) {
     selectedChannel = channel;
     selectedUsername = username;
 
-    let messages = channel.messages;
-
     $('#usernameInput').attr('placeholder', selectedUsername);
-    $('#messageArea').empty();
 
-    for (let key in messages) {
-        let message = messages[key];
-        if (message.event === false && message.action === false) {
-            appendMessage(message);
-        } else if (message.event === true) {
-            //This message is an event
-            appendEvent(message);
-        }
-    }
+    $("#messageArea").children().css('display', 'none');
+    let cleanName = channel.name.substr(1);
+    $(cleanName).css('display', 'block');
 
     fillUsermenu(channel.users);
 });
@@ -172,18 +167,22 @@ function appendMessage(message) {
     let messageEnc = encodeEntities(message.message);
 
     //Remove nick if message before was sent by the same nick
-    if (!lastNicksUnique(nick)) {
+    if (!lastNicksUnique(nick, message.to)) {
         nick = '';
     }
 
-    /*let line = '<line><timestamp>' + moment().format("HH:mm:ss") +
-        '</timestamp><nick>' + nick + '</nick><message>' +
-        message.message + '</message></line>';*/
+    let line = '<line><nick>' + nick + '</nick><message>' + messageEnc +
+        '</message></line>';
 
-    let line = '<line><nick>' + nick + '</nick><message>' + messageEnc + '</message></line>';
-
-
-    $('#messageArea').append(line);
+    //Will eventually have to refactor to check server too
+    let channelNameToAppendTo = '';
+    $('#messageArea').children().each(function(index) {
+        let tagName = $(this).prop('tagName').toLowerCase();
+        if( tagName === message.to.substr(1)) {
+            channelNameToAppendTo = message.to.substr(1);
+        }
+    });
+    $(channelNameToAppendTo).append(line);
 
     //Check if username is mentioned somewhere in the message
     let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
@@ -210,19 +209,45 @@ function appendMessage(message) {
     }
 
     //Scroll to last appended message
-    $("#messageArea").animate({ scrollTop: $("#messageArea")[0].scrollHeight}, 0);
+    updateScrollState();
 }
 
 function appendEvent(message) {
     let line = '<line><event>' + message.message + '</event></line>';
-    $('#messageArea').append(line)
+
+    //Will eventually have to refactor to check server too
+    let channelNameToAppendTo = '';
+    $('#messageArea').children().each(function(index) {
+        let tagName = $(this).prop('tagName').toLowerCase();
+        if( tagName === message.to.substr(1)) {
+            channelNameToAppendTo = message.to.substr(1);
+        }
+    });
+    $(channelNameToAppendTo).append(line);
+
+    $('#messageArea').append(line);
+
+    //Scroll to last appended message
+    updateScrollState();
+}
+
+/*
+Updates the scroll state to the last appended line
+ */
+function updateScrollState() {
+    //Scroll to last appended message
+    $("#messageArea").animate(
+        {
+            scrollTop: $("#messageArea")[0].scrollHeight
+        },0
+    );
 }
 
 /*
 This uses a permissive regex to find urls in a string
  */
 function findLinks(str) {
-    let pattern = /\b(?:[a-z]{2,}?:\/\/)?[^\s/]+\.\w{2,}(?::\d{1,5})?(?:\/[^\s]*\b|\b)(?![:.?#]\S)/gi;
+    let pattern =  /\b(?:[a-z]{2,}?:\/\/)?[^\s/]+\.\w{2,}(?::\d{1,5})?(?:\/[^\s]*\b|\b)(?![:.?#]\S)/gi;
 
     return str.match(pattern);
 }
@@ -230,9 +255,10 @@ function findLinks(str) {
 /*
 Clean that up and comment or I will forget by tomorrow
  */
-function lastNicksUnique(nextNick) {
+function lastNicksUnique(nextNick, channelName) {
     let unique = true;
-    let lastNicks = $('#messageArea line nick');
+    //Refactor that to also use server-tag name
+    let lastNicks = $(channelName + 'line nick');
     let iteratedNicks = [];
 
     $(lastNicks).reverse().each(function() {
@@ -329,3 +355,20 @@ String.prototype.insert = function (index, string) {
 jQuery.fn.reverse = function() {
     return this.pushStack(this.get().reverse(), arguments);
 };
+
+/*(function loop(i){
+    if(i<messages.length){
+        setTimeout(function(){
+            let message = messages[i];
+
+            if (message.event === false && message.action === false) {
+                appendMessage(message);
+            } else if (message.event === true) {
+                //This message is an event
+                appendEvent(message);
+            }
+
+            loop(++i)
+        },1);
+    }
+}(0));*/

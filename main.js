@@ -54,7 +54,12 @@ app.on('ready', function() {
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/app/index.html');
 
-    addClient('Testgram', 'irc.snoonet.org');
+    let clientSnoo = addClient('Testgram', 'irc.snoonet.org');
+    clientSnoo.addChannel('#linuxmasterracecirclejerk');
+    clientSnoo.addChannel('#supersecretproject');
+
+    //let clientFree = addClient('HelloWorld165', 'irc.freenode.net');
+    //clientFree.addChannel('#linuxmasterrace');
 
   //initializeIRC();
 
@@ -102,6 +107,7 @@ function addClient(name, address) {
     that contains the message content
      */
     ipcMain.on('messageSent', function(event, messageContent) {
+        console.log(messageContent);
         let selChannel = client.getSelectedChannel();
 
         let message = {
@@ -144,10 +150,9 @@ function addClient(name, address) {
         client.send('NICK', username);
     });
 
-    client.addChannel('#linuxmasterrace');
-    client.addChannel('#supersecretproject');
-
     client.connect();
+
+    return client;
 }
 
 function createWindow() {
