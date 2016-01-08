@@ -39,8 +39,8 @@ add:hover {
 }
 
 usermenu {
-    display: none;
-    margin-left: 5px;
+    display: inline-block;
+    margin-left: 15px;
     width: 40px;
     height: 40px;
     color: rgb(180, 180, 180);
@@ -50,20 +50,35 @@ usermenu {
     background: rgb(20, 20, 20);
     -webkit-app-region: no-drag;
 }
+usermenu::after {
+    content: '0';
+}
 
 usermenu:hover {
     background: rgb(10, 10, 10);
 }
 
 users {
+    display: none;
     position:relative;
+
     background: green;
     z-index: 1;
 }
 
 user {
     background: green;
+    line-heigth: 10px;
     z-index: 1;
+}
+
+.arrow {
+    width: 0;
+	height: 0;
+	border-left: 7px solid transparent;
+	border-right: 7px solid transparent;
+	border-bottom: 9px solid #F8F8F8;
+	margin-left: 15px;
 }
 
 close {

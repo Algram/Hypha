@@ -117,6 +117,17 @@ $('#titlebar').on('click', 'close', function(e) {
     ipcRenderer.send('closeWindow');
 })
 
+$('#titlebar').on('click', 'usermenu', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    $('#titlebar users').toggle();
+})
+
+$(document).click( function(){
+    $('#titlebar users').hide();
+});
+
 
 //////////////////////
 // Receiving Events //
