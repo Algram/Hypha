@@ -3,7 +3,8 @@ const ipcRenderer = require('electron').ipcRenderer;
 const path = require('path');
 const shell = require('electron').shell;
 
-let displayedChannels = [];
+let displayedServers = [];
+let selectedServer = '';
 let selectedChannel;
 let selectedUsername = '';
 
@@ -23,8 +24,8 @@ $("#messageInput").keydown(function (e) {
 
             $(this).val('');
 
-            appendMessage(message);
-            ipcRenderer.send('messageSent', message.message);
+            appendMessage(selectedServer, message);
+            ipcRenderer.send('messageSent', selectedServer, message.message);
         }
     }
 });
@@ -39,7 +40,7 @@ $("#usernameInput").keydown(function (e) {
 
             $("#usernameInput").val('');
             $("#usernameInput").attr('placeholder', username);
-            ipcRenderer.send('usernameChanged', username);
+            ipcRenderer.send('usernameChanged', selectedServer, username);
         }
     }
 });
@@ -72,17 +73,17 @@ $("#messageInput").keydown(function (e) {
     }
 });
 
-$('#channelList').on('click', 'li', function(e) {
+$('#channelList').on('click', 'channel', function(e) {
     e.preventDefault();
 
-    $('#channelList li').removeClass('selected');
+    let serverAddress = $(this).siblings('name').text();
+    console.log(serverAddress);
+
+    $('#channelList server channel').removeClass('selected');
     $(this).removeClass('unread');
     $(this).addClass('selected');
 
-    //Need to change that to check for corresponding server too
-    //otherwise there will be problem with same names on different
-    //servers
-    ipcRenderer.send('channelSelected', $(this).text());
+    ipcRenderer.send('channelSelected', serverAddress, $(this).text());
 })
 
 $('#messageArea').on('click', 'a', function(e) {
@@ -106,25 +107,75 @@ $('#titlebar').on('click', 'close', function(e) {
 // Receiving Events //
 //////////////////////
 
-ipcRenderer.on('channelData', function(event, channel) {
-    if (displayedChannels.indexOf(channel.name) == -1) {
-        displayedChannels.push(channel.name);
+ipcRenderer.on('channelData', function(event, address, channel) {
+    //First channel to arrive, add it
+    if (displayedServers.length < 1) {
+        let serverData = {
+            address: address,
+            channels: [channel.name]
+        }
 
-        //Add channel-item to channelList, refactor to also add server-item
-        let line = '<li>' + channel.name + '</li>';
-        $('#channelList ul').append(line);
+        displayedServers.push(serverData);
+
+        let line = '<server><name>' + address + '</name><channel>' +
+            channel.name + '</channel></server>';
+        $('#channelList').append(line);
 
         //Add channel-tag to messageArea, refactor to also add server-tag
-        let cleanName = channel.name.substr(1);
-        $('#messageArea').append('<' + cleanName + '>' + '</' + cleanName + '>');
+        let msgLine = '<server name="' + address + '"><channel name="' +
+            channel.name + '"></channel></server>';
+        $('#messageArea').append(msgLine);
+    }
+
+    let serverExists = false;
+    for (let key in displayedServers) {
+        let server = displayedServers[key];
+
+        if (server.address == address) {
+            //Server exists, check if channel does in server
+            serverExists = true;
+
+            if (server.channels.indexOf(channel.name) == -1) {
+                //Channel doesnt exist, add it to the server
+                server.channels.push(channel.name)
+
+                let line = '<channel>' + channel.name + '</channel>';
+                $('server name:contains(' + address + ')').parent().append(line);
+
+                //Add channel-tag to messageArea, refactor to also add server-tag
+                let selServer = $('[name="' + address + '"]');
+                let msgLine = '<channel name="' + channel.name + '"></channel>';
+                selServer.append(msgLine);
+            }
+        }
+    }
+
+    //Server doesn't exist, add it
+    if (!serverExists) {
+        let serverData = {
+            adress: address,
+            channels: [channel.name]
+        }
+
+        displayedServers.push(serverData);
+
+        let line = '<server><name>' + address + '</name><channel>' +
+            channel.name + '</channel></server>';
+        $('#channelList').append(line);
+
+        //Add channel-tag to messageArea, refactor to also add server-tag
+        let msgLine = '<server name="' + address + '"><channel name="' +
+            channel.name + '"></channel></server>';
+        $('#messageArea').append(msgLine);
     }
 });
 
-ipcRenderer.on('messageReceived', function(event, message) {
+ipcRenderer.on('messageReceived', function(event, address, message) {
     if (message.event === false && message.action === false) {
         //Mark as unread if not in selectedChannel
-        if (message.to !== selectedChannel.name) {
-            let affectedChannel = $("#channelList li").filter(function() {
+        if (address !== selectedServer || message.to !== selectedChannel.name) {
+            let affectedServer = $('server name:contains(' + address + ')').parent();
+            let affectedChannel = affectedServer.children('channel').filter(function() {
                 return ($(this).text() === message.to)
             });
 
@@ -137,52 +188,48 @@ ipcRenderer.on('messageReceived', function(event, message) {
             doNotify(selectedChannel.name + ' ' + message.from, message.message);
         }
 
-        appendMessage(message);
+        appendMessage(address, message);
 
     } else if (message.event === true) {
         //This message is an event
-        appendEvent(message);
+        appendEvent(address, message);
     }
 });
 
-ipcRenderer.on('channelSelected_reply', function(event, channel, username) {
+ipcRenderer.on('userlistChanged', function(event, address, channel) {
+    console.log(channel.users);
+});
+
+ipcRenderer.on('channelSelected_reply', function(event, address, channel, username) {
+    selectedServer = address;
     selectedChannel = channel;
     selectedUsername = username;
 
-    $('#usernameInput').attr('placeholder', selectedUsername);
+    $('#usernameInput').attr('placeholder', username);
 
-    $("#messageArea").children().css('display', 'none');
-    let cleanName = channel.name.substr(1);
-    $(cleanName).css('display', 'block');
+    $("#messageArea server").children('channel').css('display', 'none');
+    let selServer = $('[name="' + address + '"]');
+    let selChannel = selServer.children('[name="' + channel.name + '"]');
+    selChannel.css('display', 'block');
 
     fillUsermenu(channel.users);
 });
 
-ipcRenderer.on('userlistChanged', function(event, users) {
-    console.log(users);
-});
-
-function appendMessage(message) {
+function appendMessage(address, message) {
     let nick = message.from;
     let messageEnc = encodeEntities(message.message);
+    let selServer = $('[name="' + address + '"]');
+    let selChannel = selServer.children('[name="' + message.to + '"]');
 
     //Remove nick if message before was sent by the same nick
-    if (!lastNicksUnique(nick, message.to)) {
+    if (!lastNicksUnique(nick, selChannel)) {
         nick = '';
     }
 
     let line = '<line><nick>' + nick + '</nick><message>' + messageEnc +
         '</message></line>';
+    selChannel.append(line);
 
-    //Will eventually have to refactor to check server too
-    let channelNameToAppendTo = '';
-    $('#messageArea').children().each(function(index) {
-        let tagName = $(this).prop('tagName').toLowerCase();
-        if( tagName === message.to.substr(1)) {
-            channelNameToAppendTo = message.to.substr(1);
-        }
-    });
-    $(channelNameToAppendTo).append(line);
 
     //Check if username is mentioned somewhere in the message
     let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
@@ -255,10 +302,11 @@ function findLinks(str) {
 /*
 Clean that up and comment or I will forget by tomorrow
  */
-function lastNicksUnique(nextNick, channelName) {
+function lastNicksUnique(nextNick, $channel) {
+    console.log('beep');
     let unique = true;
     //Refactor that to also use server-tag name
-    let lastNicks = $(channelName + 'line nick');
+    let lastNicks = $channel.find('line nick');
     let iteratedNicks = [];
 
     $(lastNicks).reverse().each(function() {
@@ -279,6 +327,7 @@ function lastNicksUnique(nextNick, channelName) {
         }
     }
 
+    console.log(unique);
     return unique;
 }
 

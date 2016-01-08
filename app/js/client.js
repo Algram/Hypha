@@ -19,11 +19,22 @@ class Client {
     }
 
     addChannel(name) {
-        //Create a new channel object
-        let ircchannel = new channel.Channel(name);
+        let exists = false;
+        for (let key in this.channels) {
+            let selChannel = this.channels[key];
 
-        // Add it to the collection.
-        this.channels.push(ircchannel);
+            if (selChannel.getName() === name) {
+                exists = true;
+            }
+        }
+
+        if (!exists) {
+            //Create a new channel object
+            let ircchannel = new channel.Channel(name);
+
+            // Add it to the collection.
+            this.channels.push(ircchannel);
+        }
 
         // Return this object reference to allow for method chaining.
         return(this);
@@ -91,7 +102,7 @@ class Client {
 
                     if (selChannel.getName() == channelName) {
                         selChannel.addUsers(channelUsers);
-                        this.emit('channelData', selChannel);
+                        this.emit('channelData', this.address, selChannel);
                     }
                 }
             }
@@ -115,7 +126,7 @@ class Client {
                 if (channel.getName() == message.to) {
                     //Add the message to the channel object
                     channel.addMessage(message);
-                    this.emit('messageReceived', message);
+                    this.emit('messageReceived', this.address, message);
                 }
             }
         });
@@ -136,7 +147,7 @@ class Client {
                 channel.addUser(nick);
                 channel.addMessage(message);
 
-                this.emit('messageReceived', message);
+                this.emit('messageReceived', this.address, message);
             }
         });
 
@@ -154,7 +165,7 @@ class Client {
             channel.removeUser(nick);
             channel.addMessage(message);
 
-            this.emit('messageReceived', message);
+            this.emit('messageReceived', this.address, message);
         });
 
         //BUGFIX atm get's added to every open channel, even if person
@@ -175,7 +186,7 @@ class Client {
                 channel.removeUser(nick);
                 channel.addMessage(message);
 
-                this.emit('messageReceived', message);
+                this.emit('messageReceived', this.address, message);
             }
         });
 
