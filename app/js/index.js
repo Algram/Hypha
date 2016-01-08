@@ -30,6 +30,9 @@ $("#messageInput").keydown(function (e) {
     }
 });
 
+/*
+New username needs to be sent to main process
+ */
 $("#usernameInput").keydown(function (e) {
     if (e.keyCode == 13) {
         let username = $(this).val();
@@ -47,10 +50,13 @@ $("#usernameInput").keydown(function (e) {
 
 $("#messageInput").keyup(function (e) {
     if (e.keyCode == 9) {
-        e.preventDefault();
+        //e.preventDefault();
     }
 });
 
+/*
+Tab was pressed, autocomplete word to next username match
+ */
 $("#messageInput").keydown(function (e) {
     if (e.keyCode == 9) {
         e.preventDefault();
@@ -73,6 +79,9 @@ $("#messageInput").keydown(function (e) {
     }
 });
 
+/*
+New channel was selected, tell main and trigger visual changes
+ */
 $('#channelList').on('click', 'channel', function(e) {
     e.preventDefault();
 
@@ -86,6 +95,9 @@ $('#channelList').on('click', 'channel', function(e) {
     ipcRenderer.send('channelSelected', serverAddress, $(this).text());
 })
 
+/*
+Link in a message was clicked, open it with default browser
+ */
 $('#messageArea').on('click', 'a', function(e) {
     e.preventDefault();
 
@@ -97,6 +109,9 @@ $('#messageArea').on('click', 'a', function(e) {
     }
 })
 
+/*
+Tell main to close the window
+ */
 $('#titlebar').on('click', 'close', function(e) {
     e.preventDefault();
     ipcRenderer.send('closeWindow');
@@ -182,12 +197,6 @@ ipcRenderer.on('messageReceived', function(event, address, message) {
             $(affectedChannel).addClass('unread');
         }
 
-        //Check if username is mentioned somewhere in the message
-        let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
-        if (pattern.test(message.message)) {
-            doNotify(selectedChannel.name + ' ' + message.from, message.message);
-        }
-
         appendMessage(address, message);
 
     } else if (message.event === true) {
@@ -201,18 +210,23 @@ ipcRenderer.on('userlistChanged', function(event, address, channel) {
 });
 
 ipcRenderer.on('channelSelected_reply', function(event, address, channel, username) {
+    //Set global variables
     selectedServer = address;
     selectedChannel = channel;
     selectedUsername = username;
 
-    $('#usernameInput').attr('placeholder', username);
-
+    //Make messages of now selectedChannel visible, hide all others
     $("#messageArea server").children('channel').css('display', 'none');
     let selServer = $('[name="' + address + '"]');
     let selChannel = selServer.children('[name="' + channel.name + '"]');
     selChannel.css('display', 'block');
 
+    //Set new username und fill usermenu
+    $('#usernameInput').attr('placeholder', username);
     fillUsermenu(channel.users);
+
+    //Scroll to last appended message
+    updateScrollState();
 });
 
 function appendMessage(address, message) {
@@ -226,15 +240,18 @@ function appendMessage(address, message) {
         nick = '';
     }
 
+    //Create line and appen it
     let line = '<line><nick>' + nick + '</nick><message>' + messageEnc +
         '</message></line>';
     selChannel.append(line);
 
 
-    //Check if username is mentioned somewhere in the message
+    //Check if username is mentioned somewhere in the message,
+    //send a notification if there is
     let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
     if (pattern.test(messageEnc)) {
-        $('#messageArea line:last message').addClass('highlighted');
+        selChannel.find('line:last message').addClass('highlighted');
+        doNotify(selectedChannel.name + ' ' + message.from, message.message);
     }
 
     //Check if message contains links
@@ -259,20 +276,13 @@ function appendMessage(address, message) {
     updateScrollState();
 }
 
-function appendEvent(message) {
+function appendEvent(address, message) {
     let line = '<line><event>' + message.message + '</event></line>';
 
-    //Will eventually have to refactor to check server too
-    let channelNameToAppendTo = '';
-    $('#messageArea').children().each(function(index) {
-        let tagName = $(this).prop('tagName').toLowerCase();
-        if( tagName === message.to.substr(1)) {
-            channelNameToAppendTo = message.to.substr(1);
-        }
-    });
-    $(channelNameToAppendTo).append(line);
+    let selServer = $('[name="' + address + '"]');
+    let selChannel = selServer.children('[name="' + message.to + '"]');
 
-    $('#messageArea').append(line);
+    selChannel.append(line);
 
     //Scroll to last appended message
     updateScrollState();
@@ -283,11 +293,9 @@ Updates the scroll state to the last appended line
  */
 function updateScrollState() {
     //Scroll to last appended message
-    $("#messageArea").animate(
-        {
-            scrollTop: $("#messageArea")[0].scrollHeight
-        },0
-    );
+    $("#messageArea").animate({
+        scrollTop: $("#messageArea")[0].scrollHeight
+    },0);
 }
 
 /*
@@ -299,38 +307,47 @@ function findLinks(str) {
     return str.match(pattern);
 }
 
-/*
-Clean that up and comment or I will forget by tomorrow
+/**
+ * Returns true if the last nicks up until the last different nick
+ * are unique. This is used to remove the nickname when possible, for example
+ * when one user sends multiple messages
  */
 function lastNicksUnique(nextNick, $channel) {
-    console.log('beep');
     let unique = true;
-    //Refactor that to also use server-tag name
-    let lastNicks = $channel.find('line nick');
     let iteratedNicks = [];
 
+    //Get last nicks of provided channel
+    let lastNicks = $channel.find('line nick');
+
+    //Iterate over nicks in reverse, break if nextNick is not empty,
+    //add all nicks to a list
     $(lastNicks).reverse().each(function() {
         iteratedNicks.push($(this).text());
-
         if ($(this).text() !== '') {
             return false;
         }
     })
 
+    //Iterate over all nicks, return true when nick is not nextNick,
+    //return false, when nick is empty or nextNick
     for (let key in iteratedNicks) {
         let nick = iteratedNicks[key];
         if (nick != nextNick) {
             unique = true;
         } else if (nick === '' || nick == nextNick) {
             unique = false;
+
+            //Break loop since nick can't be unique anymore
             break;
         }
     }
 
-    console.log(unique);
     return unique;
 }
 
+/*
+TODO add returning of multiple names, not just the first match
+ */
 function autocomplete(str, callback) {
     let users = Object.keys(selectedChannel.users[0]);
 
@@ -358,11 +375,15 @@ function fillUsermenu(usersObj) {
     }
 }
 
+/**
+ * Use native notification-system libnotify. Works on most Mac and
+ * most Linux-Systems, no support for windows
+ */
 function doNotify(title, body) {
     let options = {
         title: title,
         body: body,
-        icon: path.join(__dirname, '../images/icon.png')
+        icon: path.join(__dirname, '/images/icon.png')
     };
 
     new Notification(options.title, options);
@@ -394,6 +415,9 @@ function encodeEntities(value) {
         replace(/>/g, '&gt;');
 }
 
+/**
+ * Insert string into string at specified index
+ */
 String.prototype.insert = function (index, string) {
   if (index > 0)
     return this.substring(0, index) + string + this.substring(index, this.length);

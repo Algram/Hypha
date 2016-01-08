@@ -12,7 +12,8 @@ class Client {
         this.selectedChannel = '';
 
         this.client = new irc.Client(address, nick, {
-        	autoConnect: false
+        	autoConnect: false,
+            realName: 'irclean_wip',
         });
 
         this.addListeners();
@@ -147,7 +148,7 @@ class Client {
                 channel.addUser(nick);
                 channel.addMessage(message);
 
-                this.emit('messageReceived', this.address, message);
+                //this.emit('messageReceived', this.address, message);
             }
         });
 
@@ -165,7 +166,7 @@ class Client {
             channel.removeUser(nick);
             channel.addMessage(message);
 
-            this.emit('messageReceived', this.address, message);
+            //this.emit('messageReceived', this.address, message);
         });
 
         //BUGFIX atm get's added to every open channel, even if person
@@ -186,7 +187,7 @@ class Client {
                 channel.removeUser(nick);
                 channel.addMessage(message);
 
-                this.emit('messageReceived', this.address, message);
+                //this.emit('messageReceived', this.address, message);
             }
         });
 
