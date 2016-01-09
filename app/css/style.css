@@ -55,13 +55,28 @@ a:hover {
 #titlebar usermenu::after {
     content: '0';
 }
+#titlebar usermenu::after {
+    margin-left: 80px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 12px solid purple;
+}
+
+#titlebar usermenu.hidden::after {
+    display: none;
+}
+
+.hidden {
+    display: none;
+}
 
 #titlebar usermenu:hover {
     background: rgb(10, 10, 10);
 }
 
 #titlebar users {
-    display: none;
     position: absolute;
     padding: 10px;
     width: 130px;
@@ -75,10 +90,6 @@ a:hover {
 
 #titlebar user {
     display: block;
-}
-
-#titlebar user:first-of-type {
-    margin-top: 10px;
 }
 
 #titlebar close {
@@ -95,16 +106,6 @@ a:hover {
 
 #titlebar close:hover {
     background: rgb(10, 10, 10);
-}
-
-.arrow {
-    margin-top: -22px;
-    margin-left: 80px;
-    width: 0;
-	height: 0;
-	border-left: 10px solid transparent;
-	border-right: 10px solid transparent;
-	border-bottom: 12px solid purple;
 }
 
 #content {

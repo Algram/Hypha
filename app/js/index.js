@@ -121,11 +121,11 @@ $('#titlebar').on('click', 'usermenu', function(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    $('#titlebar users').toggle();
+    $('#titlebar users').toggleClass('hidden');
 })
 
 $(document).click( function(){
-    $('#titlebar users').hide();
+    $('#titlebar users').addClass('hidden');
 });
 
 
