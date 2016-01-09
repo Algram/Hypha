@@ -374,9 +374,9 @@ function autocomplete(str, callback) {
 }
 
 function fillUsermenu(usersObj) {
-    $('usermenu users').empty();
+    $('usermenu users').not(':first').empty();
 
-    let users = Object.keys(usersObj);
+    let users = Object.keys(usersObj[0]);
 
     for (let key in users) {
         let user = users[key];
