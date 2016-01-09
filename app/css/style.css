@@ -15,8 +15,6 @@ a:hover {
 
 #titlebar {
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
     -webkit-user-select: none;
     -webkit-app-region: drag;
     height: 40px;
@@ -31,7 +29,6 @@ a:hover {
     align-items: center;
     width: 40px;
     height: 40px;
-    margin-right: auto;
     color: rgb(180, 180, 180);
     background: rgb(20, 20, 20);
     -webkit-app-region: no-drag;
@@ -78,6 +75,7 @@ a:hover {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: auto;
     width: 40px;
     height: 40px;
     color: rgb(180, 180, 180);
