@@ -86,7 +86,6 @@ $('#channelList').on('click', 'channel', function(e) {
     e.preventDefault();
 
     let serverAddress = $(this).siblings('name').text();
-    console.log(serverAddress);
 
     $('#channelList server channel').removeClass('selected');
     $(this).removeClass('unread');
@@ -179,7 +178,7 @@ ipcRenderer.on('channelData', function(event, address, channel) {
     //Server doesn't exist, add it
     if (!serverExists) {
         let serverData = {
-            adress: address,
+            address: address,
             channels: [channel.name]
         }
 
@@ -374,7 +373,7 @@ function autocomplete(str, callback) {
 }
 
 function fillUsermenu(usersObj) {
-    $('usermenu users').not(':first').empty();
+    $('usermenu users').empty();
 
     let users = Object.keys(usersObj[0]);
 

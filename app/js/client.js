@@ -134,7 +134,7 @@ class Client {
 
         this.client.addListener('join', (channelName, nick, messageObj) => {
             //Filter out own join message
-            if (nick !== this.nick) {
+            /*if (nick !== this.nick) {
                 let channel = this.getChannel(channelName);
 
                 let message = {
@@ -147,9 +147,8 @@ class Client {
 
                 channel.addUser(nick);
                 channel.addMessage(message);
-
                 //this.emit('messageReceived', this.address, message);
-            }
+            }*/
         });
 
         this.client.addListener('part', (channelName, nick, reason, messageObj) => {
