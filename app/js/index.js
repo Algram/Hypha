@@ -120,7 +120,7 @@ $('#titlebar').on('click', 'close', function(e) {
 $('#titlebar').on('click', 'usermenu', function(e) {
     e.preventDefault();
     e.stopPropagation();
-    
+
     $('#titlebar users').toggle();
 })
 
