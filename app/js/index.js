@@ -384,6 +384,8 @@ function fillUsermenu(usersObj) {
 
         $('usermenu users').append('<user>' + user + '</user>');
     }
+
+    $('usermenu').attr('data-before', users.length);
 }
 
 /**

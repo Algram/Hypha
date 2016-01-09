@@ -53,14 +53,19 @@ a:hover {
     -webkit-app-region: no-drag;
 }
 #titlebar usermenu::after {
-    content: '0';
+    content: attr(data-before);
 }
 #titlebar usermenu::before {
+    content: '';
+    position: absolute;
     width: 0;
     height: 0;
+    top: 43px;
+    left: 10px;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-bottom: 12px solid green;
+    border-bottom: 12px solid rgb(20, 20, 20);
+    z-index: 1;
 }
 
 #titlebar usermenu.closed::before {
@@ -79,16 +84,17 @@ a:hover {
     position: absolute;
     padding: 10px;
     width: 130px;
-    height: 200px;
+    max-height: 200px;
     overflow: auto;
     top: 55px;
     left: -80px;
-    background: purple;
+    background: rgb(20, 20, 20);
     z-index: 1;
 }
 
 #titlebar user {
     display: block;
+    color: rgb(180, 180, 180)
 }
 
 #titlebar close {
@@ -257,6 +263,20 @@ event {
 
 #usernameInput + #messageInput {
     border-left-width: 0;
+}
+
+usermenu ::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+usermenu ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+usermenu ::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 5px;
+  background: rgba(60, 60, 60, .33);
 }
 
 ::-webkit-scrollbar-corner {
