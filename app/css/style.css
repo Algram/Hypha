@@ -55,20 +55,19 @@ a:hover {
 #titlebar usermenu::after {
     content: '0';
 }
-#titlebar usermenu::after {
-    margin-left: 80px;
+#titlebar usermenu::before {
     width: 0;
     height: 0;
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-bottom: 12px solid purple;
+    border-bottom: 12px solid green;
 }
 
-#titlebar usermenu.hidden::after {
+#titlebar usermenu.closed::before {
     display: none;
 }
 
-.hidden {
+#titlebar usermenu.closed users {
     display: none;
 }
 
