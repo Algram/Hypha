@@ -63,7 +63,7 @@ app.on('ready', function() {
 
   let network = new irc.Network('testnetwork');
   //network.addClient('Testgram', 'irc.snoonet.org');
-  network.addClient('helloworld16', 'irc.freenode.net');
+  //network.addClient('helloworld16', 'irc.freenode.net');
   //network.addClient('helloworld167', 'irc.esper.net');
 
   /*let c1 = network.getClient('irc.snoonet.org');
@@ -71,10 +71,10 @@ app.on('ready', function() {
   c1.addChannel('#linuxmasterrace');
   c1.connect();*/
 
-  let c2 = network.getClient('irc.freenode.net');
+  /*let c2 = network.getClient('irc.freenode.net');
   c2.addChannel('#linuxmasterrace');
   c2.addChannel('#linasdasde');
-  c2.connect();
+  c2.connect();*/
 
   /*let c2 = network.getClient('irc.freenode.net');
   c2.addChannel('#ubuntu');
