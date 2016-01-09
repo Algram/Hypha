@@ -14,6 +14,9 @@ a:hover {
 }
 
 #titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     -webkit-user-select: none;
     -webkit-app-region: drag;
     height: 40px;
@@ -21,55 +24,68 @@ a:hover {
     background: rgb(30, 30, 30);
 }
 
-add {
-    display: inline-block;
-    float: left;
+#titlebar add {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 40px;
     height: 40px;
+    margin-right: auto;
     color: rgb(180, 180, 180);
-    line-height: 40px;
-    text-align: center;
-    vertical-align: center;
     background: rgb(20, 20, 20);
     -webkit-app-region: no-drag;
 }
 
-add:hover {
+#titlebar add:hover {
     background: rgb(10, 10, 10);
 }
 
-usermenu {
-    display: inline-block;
-    margin-left: 15px;
+#titlebar usermenu {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 40px;
     height: 40px;
+    margin-right: 20px;
     color: rgb(180, 180, 180);
-    line-height: 40px;
-    text-align: center;
-    vertical-align: center;
     background: rgb(20, 20, 20);
     -webkit-app-region: no-drag;
 }
-usermenu::after {
+#titlebar usermenu::after {
     content: '0';
 }
 
-usermenu:hover {
+#titlebar usermenu:hover {
     background: rgb(10, 10, 10);
 }
 
-users {
+#titlebar users {
     display: none;
-    position:relative;
-
     background: green;
     z-index: 1;
 }
 
-user {
+#titlebar user {
     background: green;
-    line-heigth: 10px;
     z-index: 1;
+}
+
+#titlebar close {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    color: rgb(180, 180, 180);
+    background: rgb(20, 20, 20);
+    -webkit-app-region: no-drag;
+}
+
+#titlebar close:hover {
+    background: rgb(10, 10, 10);
 }
 
 .arrow {
@@ -79,23 +95,6 @@ user {
 	border-right: 7px solid transparent;
 	border-bottom: 9px solid #F8F8F8;
 	margin-left: 15px;
-}
-
-close {
-    display: inline-block;
-    float: right;
-    width: 40px;
-    height: 40px;
-    color: rgb(180, 180, 180);
-    line-height: 40px;
-    text-align: center;
-    vertical-align: center;
-    background: rgb(20, 20, 20);
-    -webkit-app-region: no-drag;
-}
-
-close:hover {
-    background: rgb(10, 10, 10);
 }
 
 #content {
