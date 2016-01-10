@@ -6,6 +6,7 @@ const Menu = electron.Menu;
 const Tray = electron.Tray;
 const ipcMain = require('electron').ipcMain;
 const irc = require('./app/js/network');
+const storage = require('./app/js/storage');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -150,11 +151,49 @@ app.on('ready', function() {
     mainWindow = null;
   });
 
+  // Emitted when the window is being closed.
+  mainWindow.on('close', function() {
+    let bounds = mainWindow.getBounds();
+    storage.set("lastWindowState", {
+        x: bounds.x,
+        y: bounds.y,
+        width: bounds.width,
+        height: bounds.height,
+        maximized: mainWindow.isMaximized()
+    });
+  });
+
   ipcMain.on('closeWindow', function(event) {
       mainWindow.close();
   });
 });
 
+function createWindow() {
+    let lastWindowState = storage.get("lastWindowState");
+    if (lastWindowState === null) {
+        lastWindowState = {
+            width: 800,
+            height: 600,
+            maximized: false
+        }
+    }
+
+    mainWindow = new BrowserWindow({
+        x: lastWindowState.x,
+        y: lastWindowState.y,
+        width: lastWindowState.width,
+        height: lastWindowState.height,
+        minWidth: 500,
+        minHeight: 300,
+        frame: false,
+        overlayScrollbar: true,
+        icon: __dirname + '/app/images/logo.png'
+    });
+
+    if (lastWindowState.maximized) {
+        mainWindow.maximize();
+    }
+}
 
 function addClient(name, address) {
     /*
@@ -175,30 +214,3 @@ function addClient(name, address) {
 
     return client;
 }
-
-function createWindow() {
-  mainWindow = new BrowserWindow({
-      width: 800,
-      height: 600,
-      frame: false,
-      x: 400,
-      y: 400,
-      minWidth: 500,
-      minHeight: 300,
-      overlayScrollbar: true,
-      icon: __dirname + '/app/images/logo.png'
-  });
-}
-
-
-/*function initializeIRC() {
-    ipcMain.on('setNewUsername', function(event, username) {
-        channels.getSelectedChannel(function(channel) {
-            channels.setChannelUsername(channel.name, username, function(r) {
-                console.log(r.username);
-            });
-        });
-
-        client.send('NICK', username);
-    });
-}*/
