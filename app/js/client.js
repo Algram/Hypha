@@ -85,6 +85,10 @@ class Client {
 		});
 	}
 
+	join(name) {
+		this.client.join(name);
+	}
+
 	addListeners() {
 		/*
 		This event happens everytime the client connects to a channel

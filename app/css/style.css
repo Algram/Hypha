@@ -292,3 +292,35 @@ usermenu ::-webkit-scrollbar-thumb {
   -webkit-border-radius: 5px;
   background: rgba(140, 140, 140, .33);
 }
+
+/* Modal */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  width: 400px;
+  height: 200px;
+  background: #fff;
+  box-shadow: 0 0 0 1000em rgba(0,0,0,.5);
+}
+
+.modal.active {
+  display: block;
+}
+
+.modal .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.prevent {
+  pointer-events: none;
+}
+
+.prevent .modal {
+  pointer-events: auto;
+}

@@ -123,6 +123,31 @@ $('#titlebar').on('click', 'usermenu', function (e) {
 	$('#titlebar usermenu').toggleClass('closed');
 })
 
+$('#titlebar').on('click', 'add',function (e) {
+	$('body').toggleClass('prevent');
+	$('.modal').toggleClass('active');
+
+    //testing
+    for(let key in displayedServers) {
+        let server = displayedServers[key];
+        $('.modal select').append('<option>' + server.address + '</option>');
+    }
+});
+
+$('.modal').on('click', 'button',function (e) {
+	$('body').toggleClass('prevent');
+	$('.modal').toggleClass('active');
+
+    //selectedServer
+    let selServer = $('.modal select :selected').text();
+
+    //Add new channel
+    let newChannel = $('#channelInput').val();
+
+    ipcRenderer.send('channelAdded', selServer, newChannel);
+
+});
+
 $(document).click(function () {
 	$('#titlebar usermenu').addClass('closed');
 });
@@ -205,6 +230,13 @@ ipcRenderer.on('messageReceived', function (event, address, message) {
 
 			$(affectedChannel).addClass('unread');
 		}
+
+		//Make messages of now selectedChannel visible, hide all others
+		//TODO code-duplication
+		$("#messageArea server").children('channel').css('display', 'none');
+		let selServer = $('[name="' + address + '"]');
+		let selChannel = selServer.children('[name="' + selectedChannel + '"]');
+		selChannel.css('display', 'block');
 
 		appendMessage(address, message);
 
