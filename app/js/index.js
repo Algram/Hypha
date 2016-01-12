@@ -5,7 +5,7 @@ const shell = require('electron').shell;
 
 let displayedServers = [];
 let selectedServer = '';
-let selectedChannel;
+let selectedChannel = '';
 let selectedUsername = '';
 
 /*
@@ -235,7 +235,7 @@ ipcRenderer.on('messageReceived', function (event, address, message) {
 		//TODO code-duplication
 		$("#messageArea server").children('channel').css('display', 'none');
 		let selServer = $('[name="' + address + '"]');
-		let selChannel = selServer.children('[name="' + selectedChannel + '"]');
+		let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
 		selChannel.css('display', 'block');
 
 		appendMessage(address, message);
@@ -285,6 +285,9 @@ function appendMessage(address, message) {
 	let line = '<line><nick>' + nick + '</nick><message>' + messageEnc +
 		'</message></line>';
 	selChannel.append(line);
+
+	//Color nick based on string-hash
+	$('#messageArea line:last nick').css('color', stringToColour(nick));
 
 	//Check if username is mentioned somewhere in the message,
 	//send a notification if there is
@@ -470,6 +473,20 @@ String.prototype.insert = function (index, string) {
 jQuery.fn.reverse = function () {
 	return this.pushStack(this.get().reverse(), arguments);
 };
+
+function stringToColour(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    var colour = '#';
+
+    for (let i = 0; i < 3; i++) {
+        let value = (hash >> (i * 8)) & 0xFF;
+        colour += ('00' + value.toString(16)).substr(-2);
+    }
+    return colour;
+}
 
 /*(function loop(i){
     if(i<messages.length){

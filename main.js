@@ -64,14 +64,14 @@ app.on('ready', function () {
 	clientFree.addChannel('#linuxmasterrace');*/
 
 	let network = new irc.Network('testnetwork');
-	//network.addClient('Testgram', 'irc.snoonet.org');
+	network.addClient('Testgram', 'irc.snoonet.org');
 	//network.addClient('helloworld16', 'irc.freenode.net');
-	network.addClient('helloworld167', 'irc.esper.net');
+	//network.addClient('helloworld167', 'irc.esper.net');
 
-	/*let c1 = network.getClient('irc.snoonet.org');
+	let c1 = network.getClient('irc.snoonet.org');
 	c1.addChannel('#supersecretproject');
 	c1.addChannel('#linuxmasterrace');
-	c1.connect();*/
+	c1.connect();
 
 	/*let c2 = network.getClient('irc.freenode.net');
 	c2.addChannel('#linuxmasterrace');
@@ -83,11 +83,11 @@ app.on('ready', function () {
 	c2.addChannel('#arch');
 	c2.connect();*/
 
-	let c3 = network.getClient('irc.esper.net');
+	/*let c3 = network.getClient('irc.esper.net');
 	c3.addChannel('#linuxmasterrace');
 	c3.addChannel('#somechannelname123');
 	c3.addChannel('#anothernameforachannel');
-	c3.connect();
+	c3.connect();*/
 
 	network.on('channelData', function (address, channel) {
 		mainWindow.webContents.send('channelData', address, channel);
