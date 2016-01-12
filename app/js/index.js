@@ -5,7 +5,7 @@ const util = require('./js/util');
 let displayedServers = [];
 let selectedServer = '';
 let selectedChannel;
-let selectedUsername = '';
+let selectedUsername;
 
 /*
 New channel was selected, tell main and trigger visual changes
@@ -137,8 +137,7 @@ ipcRenderer.on('channelData', function (event, address, channel) {
 ipcRenderer.on('messageReceived', function (event, address, message) {
 	if (message.event === false && message.action === false) {
 		//Mark as unread if not in selectedChannel
-		if (address !== selectedServer || message.to !== selectedChannel.name ||
-				selectedChannel === null) {
+		if (address !== selectedServer || message.to !== selectedChannel.name) {
 			let affectedServer = $('server name:contains(' + address + ')').parent();
 			let affectedChannel = affectedServer.children('channel').filter(function () {
 				return ($(this).text() === message.to)
@@ -147,12 +146,17 @@ ipcRenderer.on('messageReceived', function (event, address, message) {
 			$(affectedChannel).addClass('unread');
 		}
 
-		//Make messages of now selectedChannel visible, hide all others
-		//TODO code-duplication
-		$("#messageArea server").children('channel').css('display', 'none');
-		let selServer = $('[name="' + address + '"]');
-		let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
-		selChannel.css('display', 'block');
+		//Need to handle when channel is not clicked yet, edge case
+		if (selectedChannel !== undefined) {
+			//Make messages of now selectedChannel visible, hide all others
+			//TODO code-duplication
+			$("#messageArea server").children('channel').css('display', 'none');
+			let selServer = $('[name="' + address + '"]');
+			let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
+			selChannel.css('display', 'block');
+		} else {
+			$("#messageArea server").children('channel').css('display', 'none');
+		}
 
 		appendMessage(address, message);
 
@@ -183,10 +187,12 @@ function appendMessage(address, message) {
 
 	//Check if username is mentioned somewhere in the message,
 	//send a notification if there is
-	let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
-	if (pattern.test(messageEnc)) {
-		selChannel.find('line:last message').addClass('highlighted');
-		util.doNotify(selectedChannel.name + ' ' + message.from, message.message);
+	if (selectedUsername !== undefined) {
+		let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
+		if (pattern.test(messageEnc)) {
+			selChannel.find('line:last message').addClass('highlighted');
+			util.doNotify(message.to + ' ' + message.from, message.message);
+		}
 	}
 
 	//Check if message contains links
