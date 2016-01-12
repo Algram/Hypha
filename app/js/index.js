@@ -177,13 +177,13 @@ function appendMessage(address, message) {
 		nick = '';
 	}
 
-	//Create line and appen it
+	//Create line and append it
 	let line = '<line><nick>' + nick + '</nick><message>' + messageEnc +
 		'</message></line>';
 	selChannel.append(line);
 
 	//Color nick based on string-hash
-	$('#messageArea line:last nick').css('color', util.stringToColour(nick));
+	selChannel.find('line:last nick').css('color', util.stringToColour(nick));
 
 	//Check if username is mentioned somewhere in the message,
 	//send a notification if there is
