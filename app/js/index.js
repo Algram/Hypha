@@ -1,83 +1,11 @@
 'use strict';
 const ipcRenderer = require('electron').ipcRenderer;
-const path = require('path');
-const shell = require('electron').shell;
+const util = require('./js/util');
 
 let displayedServers = [];
 let selectedServer = '';
-let selectedChannel = '';
+let selectedChannel;
 let selectedUsername = '';
-
-/*
-New message needs to be sent to main process
- */
-$("#messageInput").keydown(function (e) {
-	if (e.keyCode == 13) {
-		let messageContent = $(this).val();
-
-		if (messageContent !== '') {
-			let message = {
-				from: selectedUsername,
-				to: selectedChannel.name,
-				message: messageContent
-			}
-
-			$(this).val('');
-
-			appendMessage(selectedServer, message);
-			ipcRenderer.send('messageSent', selectedServer, message.message);
-		}
-	}
-});
-
-/*
-New username needs to be sent to main process
- */
-$("#usernameInput").keydown(function (e) {
-	if (e.keyCode == 13) {
-		let username = $(this).val();
-		console.log('pressed');
-
-		if (username !== '') {
-			selectedUsername = username;
-
-			$("#usernameInput").val('');
-			$("#usernameInput").attr('placeholder', username);
-			ipcRenderer.send('usernameChanged', selectedServer, username);
-		}
-	}
-});
-
-$("#messageInput").keyup(function (e) {
-	if (e.keyCode == 9) {
-		//e.preventDefault();
-	}
-});
-
-/*
-Tab was pressed, autocomplete word to next username match
- */
-$("#messageInput").keydown(function (e) {
-	if (e.keyCode == 9) {
-		e.preventDefault();
-
-		let inputContent = $(this).val();
-		let lastWord = inputContent.split(' ').pop();
-
-		if (inputContent !== '') {
-			autocomplete(lastWord, function (name) {
-				let cachedContent = inputContent.substring(
-					0, inputContent.lastIndexOf(" "));
-
-				if (cachedContent === '') {
-					$("#messageInput").val(name + ': ');
-				} else {
-					$("#messageInput").val(cachedContent + ' ' + name);
-				}
-			})
-		}
-	}
-});
 
 /*
 New channel was selected, tell main and trigger visual changes
@@ -94,34 +22,25 @@ $('#channelList').on('click', 'channel', function (e) {
 	ipcRenderer.send('channelSelected', serverAddress, $(this).text());
 })
 
-/*
-Link in a message was clicked, open it with default browser
- */
-$('#messageArea').on('click', 'a', function (e) {
-	e.preventDefault();
+ipcRenderer.on('channelSelected_reply', function (event, address, channel, username) {
+	//Set global variables
+	selectedServer = address;
+	selectedChannel = channel;
+	selectedUsername = username;
 
-	//Check if "http://" is there and add it if necessary
-	if ($(this).text().match(/^[^/]+:\/\//)) {
-		shell.openExternal($(this).text());
-	} else {
-		shell.openExternal('http://' + $(this).text());
-	}
-})
+	//Make messages of now selectedChannel visible, hide all others
+	$("#messageArea server").children('channel').css('display', 'none');
+	let selServer = $('[name="' + address + '"]');
+	let selChannel = selServer.children('[name="' + channel.name + '"]');
+	selChannel.css('display', 'block');
 
-/*
-Tell main to close the window
- */
-$('#titlebar').on('click', 'close', function (e) {
-	e.preventDefault();
-	ipcRenderer.send('closeWindow');
-})
+	//Set new username und fill usermenu
+	$('#usernameInput').attr('placeholder', username);
+	util.fillUsermenu(channel.users);
 
-$('#titlebar').on('click', 'usermenu', function (e) {
-	e.preventDefault();
-	e.stopPropagation();
-
-	$('#titlebar usermenu').toggleClass('closed');
-})
+	//Scroll to last appended message
+	util.updateScrollState();
+});
 
 $('#titlebar').on('click', 'add',function (e) {
 	$('body').toggleClass('prevent');
@@ -146,10 +65,6 @@ $('.modal').on('click', 'button',function (e) {
 
     ipcRenderer.send('channelAdded', selServer, newChannel);
 
-});
-
-$(document).click(function () {
-	$('#titlebar usermenu').addClass('closed');
 });
 
 //////////////////////
@@ -222,7 +137,8 @@ ipcRenderer.on('channelData', function (event, address, channel) {
 ipcRenderer.on('messageReceived', function (event, address, message) {
 	if (message.event === false && message.action === false) {
 		//Mark as unread if not in selectedChannel
-		if (address !== selectedServer || message.to !== selectedChannel.name) {
+		if (address !== selectedServer || message.to !== selectedChannel.name ||
+				selectedChannel === null) {
 			let affectedServer = $('server name:contains(' + address + ')').parent();
 			let affectedChannel = affectedServer.children('channel').filter(function () {
 				return ($(this).text() === message.to)
@@ -246,38 +162,14 @@ ipcRenderer.on('messageReceived', function (event, address, message) {
 	}
 });
 
-ipcRenderer.on('userlistChanged', function (event, address, channel) {
-	console.log(channel.users);
-});
-
-ipcRenderer.on('channelSelected_reply', function (event, address, channel, username) {
-	//Set global variables
-	selectedServer = address;
-	selectedChannel = channel;
-	selectedUsername = username;
-
-	//Make messages of now selectedChannel visible, hide all others
-	$("#messageArea server").children('channel').css('display', 'none');
-	let selServer = $('[name="' + address + '"]');
-	let selChannel = selServer.children('[name="' + channel.name + '"]');
-	selChannel.css('display', 'block');
-
-	//Set new username und fill usermenu
-	$('#usernameInput').attr('placeholder', username);
-	fillUsermenu(channel.users);
-
-	//Scroll to last appended message
-	updateScrollState();
-});
-
 function appendMessage(address, message) {
 	let nick = message.from;
-	let messageEnc = encodeEntities(message.message);
+	let messageEnc = util.encodeEntities(message.message);
 	let selServer = $('[name="' + address + '"]');
 	let selChannel = selServer.children('[name="' + message.to + '"]');
 
 	//Remove nick if message before was sent by the same nick
-	if (!lastNicksUnique(nick, selChannel)) {
+	if (!util.lastNicksUnique(nick, selChannel)) {
 		nick = '';
 	}
 
@@ -287,18 +179,18 @@ function appendMessage(address, message) {
 	selChannel.append(line);
 
 	//Color nick based on string-hash
-	$('#messageArea line:last nick').css('color', stringToColour(nick));
+	$('#messageArea line:last nick').css('color', util.stringToColour(nick));
 
 	//Check if username is mentioned somewhere in the message,
 	//send a notification if there is
 	let pattern = new RegExp('\\b' + selectedUsername + '\\b', 'ig');
 	if (pattern.test(messageEnc)) {
 		selChannel.find('line:last message').addClass('highlighted');
-		doNotify(selectedChannel.name + ' ' + message.from, message.message);
+		util.doNotify(selectedChannel.name + ' ' + message.from, message.message);
 	}
 
 	//Check if message contains links
-	let links = findLinks(messageEnc);
+	let links = util.findLinks(messageEnc);
 	if (links !== null) {
 		let insertStr = messageEnc;
 
@@ -316,7 +208,7 @@ function appendMessage(address, message) {
 	}
 
 	//Scroll to last appended message
-	updateScrollState();
+	util.updateScrollState();
 }
 
 function appendEvent(address, message) {
@@ -328,137 +220,105 @@ function appendEvent(address, message) {
 	selChannel.append(line);
 
 	//Scroll to last appended message
-	updateScrollState();
+	util.updateScrollState();
 }
 
 /*
-Updates the scroll state to the last appended line
+Usermenu was clicked, open it
  */
-function updateScrollState() {
-	//Scroll to last appended message
-	$("#messageArea").animate({
-		scrollTop: $("#messageArea")[0].scrollHeight
-	}, 0);
-}
+$('#titlebar').on('click', 'usermenu', function (e) {
+	e.preventDefault();
+	e.stopPropagation();
+
+	$('#titlebar usermenu').toggleClass('closed');
+})
 
 /*
-This uses a permissive regex to find urls in a string
+Close usermenu again if a click occurs somewhere on the document selector
  */
-function findLinks(str) {
-	let pattern = /\b(?:[a-z]{2,}?:\/\/)?[^\s/]+\.\w{2,}(?::\d{1,5})?(?:\/[^\s]*\b|\b)(?![:.?#]\S)/gi;
-
-	return str.match(pattern);
-}
-
-/**
- * Returns true if the last nicks up until the last different nick
- * are unique. This is used to remove the nickname when possible, for example
- * when one user sends multiple messages
- */
-function lastNicksUnique(nextNick, $channel) {
-	let unique = true;
-	let iteratedNicks = [];
-
-	//Get last nicks of provided channel
-	let lastNicks = $channel.find('line nick');
-
-	//Iterate over nicks in reverse, break if nextNick is not empty,
-	//add all nicks to a list
-	$(lastNicks).reverse().each(function () {
-		iteratedNicks.push($(this).text());
-		if ($(this).text() !== '') {
-			return false;
-		}
-	})
-
-	//Iterate over all nicks, return true when nick is not nextNick,
-	//return false, when nick is empty or nextNick
-	for (let key in iteratedNicks) {
-		let nick = iteratedNicks[key];
-		if (nick != nextNick) {
-			unique = true;
-		} else if (nick === '' || nick == nextNick) {
-			unique = false;
-
-			//Break loop since nick can't be unique anymore
-			break;
-		}
-	}
-
-	return unique;
-}
+$(document).click(function () {
+	$('#titlebar usermenu').addClass('closed');
+});
 
 /*
-TODO add returning of multiple names, not just the first match
+Enter was pressed, new message needs to be sent to main process
  */
-function autocomplete(str, callback) {
-	let users = Object.keys(selectedChannel.users[0]);
+$("#messageInput").keydown(function (e) {
+	if (e.keyCode == 13) {
+		let messageContent = $(this).val();
 
-	for (let key in users) {
-		let user = users[key];
-		user = user.split(':')[0];
+		if (messageContent !== '') {
+			let message = {
+				from: selectedUsername,
+				to: selectedChannel.name,
+				message: messageContent
+			}
 
-		//Check if str is the start of user
-		if (user.indexOf(str) === 0) {
-			callback(user);
+			$(this).val('');
+
+			appendMessage(selectedServer, message);
+			ipcRenderer.send('messageSent', selectedServer, message.message);
 		}
 	}
-}
+});
 
-function fillUsermenu(usersObj) {
-	$('usermenu users').empty();
+/*
+Enter was pressed, new username needs to be sent to main process
+ */
+$("#usernameInput").keydown(function (e) {
+	if (e.keyCode == 13) {
+		let username = $(this).val();
 
-	let users = Object.keys(usersObj[0]);
+		if (username !== '') {
+			selectedUsername = username;
 
-	for (let key in users) {
-		let user = users[key];
-		user = user.split(':')[0];
-
-		$('usermenu users').append('<user>' + user + '</user>');
+			$("#usernameInput").val('');
+			$("#usernameInput").attr('placeholder', username);
+			ipcRenderer.send('usernameChanged', selectedServer, username);
+		}
 	}
+});
 
-	$('usermenu').attr('data-before', users.length);
-}
-
-/**
- * Use native notification-system libnotify. Works on most Mac and
- * most Linux-Systems, no support for windows
+/*
+Tab was pressed, autocomplete word to next username match
  */
-function doNotify(title, body) {
-	let options = {
-		title: title,
-		body: body,
-		icon: path.join(__dirname, '/images/icon.png')
-	};
+$("#messageInput").keydown(function (e) {
+	if (e.keyCode == 9) {
+		e.preventDefault();
 
-	new Notification(options.title, options);
-}
+		let inputContent = $(this).val();
+		let lastWord = inputContent.split(' ').pop();
 
-/**
- * Escapes all potentially dangerous characters, so that the
- * resulting string can be safely inserted into attribute or
- * element text.
- * @param value
- * @returns {string} escaped text
+		if (inputContent !== '') {
+			util.autocomplete(lastWord, selectedChannel.users[0], function (name) {
+				let cachedContent = inputContent.substring(
+					0, inputContent.lastIndexOf(" "));
+
+				if (cachedContent === '') {
+					$("#messageInput").val(name + ': ');
+				} else {
+					$("#messageInput").val(cachedContent + ' ' + name);
+				}
+			})
+		}
+	}
+});
+
+/*
+Link in a message was clicked, open it with default browser
  */
-function encodeEntities(value) {
-	let surrogate_pair_regexp = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
-	// Match everything outside of normal chars and " (quote character)
-	let non_alphanumeric_regexp = /([^\#-~| |!])/g;
+$('#messageArea').on('click', 'a', function (e) {
+	e.preventDefault();
+	util.openLink($(this).text());
+})
 
-	return value.
-	replace(/&/g, '&amp;').
-	replace(surrogate_pair_regexp, function (value) {
-		let hi = value.charCodeAt(0);
-		let low = value.charCodeAt(1);
-		return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
-	}).
-	replace(non_alphanumeric_regexp, function (value) {
-		return '&#' + value.charCodeAt(0) + ';';
-	}).
-	replace(/</g, '&lt;').
-	replace(/>/g, '&gt;');
-}
+/*
+Tell main to close the window
+ */
+$('#titlebar').on('click', 'close', function (e) {
+	e.preventDefault();
+	ipcRenderer.send('closeWindow');
+})
 
 /**
  * Insert string into string at specified index
@@ -470,37 +330,9 @@ String.prototype.insert = function (index, string) {
 		return string + this;
 };
 
+/**
+ * Reverse the given array
+ */
 jQuery.fn.reverse = function () {
 	return this.pushStack(this.get().reverse(), arguments);
 };
-
-function stringToColour(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    var colour = '#';
-
-    for (let i = 0; i < 3; i++) {
-        let value = (hash >> (i * 8)) & 0xFF;
-        colour += ('00' + value.toString(16)).substr(-2);
-    }
-    return colour;
-}
-
-/*(function loop(i){
-    if(i<messages.length){
-        setTimeout(function(){
-            let message = messages[i];
-
-            if (message.event === false && message.action === false) {
-                appendMessage(message);
-            } else if (message.event === true) {
-                //This message is an event
-                appendEvent(message);
-            }
-
-            loop(++i)
-        },1);
-    }
-}(0));*/
