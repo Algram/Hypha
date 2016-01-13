@@ -56,38 +56,8 @@ app.on('ready', function () {
 	// and load the index.html of the app.
 	mainWindow.loadURL('file://' + __dirname + '/app/index.html');
 
-	/*let clientSnoo = addClient('Testgram', 'irc.snoonet.org');
-	clientSnoo.addChannel('#linuxmasterracecirclejerk');
-	clientSnoo.addChannel('#supersecretproject');
-
-	let clientFree = addClient('HelloWorld165', 'irc.freenode.net');
-	clientFree.addChannel('#linuxmasterrace');*/
-
+	//Create the main network for the client
 	let network = new irc.Network('testnetwork');
-	//network.addClient('Testgram', 'irc.snoonet.org');
-	//network.addClient('helloworld16', 'irc.freenode.net');
-	//network.addClient('helloworld167', 'irc.esper.net');
-
-	/*let c1 = network.getClient('irc.snoonet.org');
-	c1.addChannel('#supersecretproject');
-	c1.addChannel('#linuxmasterrace');
-	c1.connect();*/
-
-	/*let c2 = network.getClient('irc.freenode.net');
-	c2.addChannel('#linuxmasterrace');
-	c2.addChannel('#linasdasde');
-	c2.connect();*/
-
-	/*let c2 = network.getClient('irc.freenode.net');
-	c2.addChannel('#ubuntu');
-	c2.addChannel('#arch');
-	c2.connect();*/
-
-	/*let c3 = network.getClient('irc.esper.net');
-	c3.addChannel('#linuxmasterrace');
-	c3.addChannel('#somechannelname123');
-	c3.addChannel('#anothernameforachannel');
-	c3.connect();*/
 
 	network.on('channelData', function (address, channel) {
 		mainWindow.webContents.send('channelData', address, channel);
@@ -170,6 +140,10 @@ app.on('ready', function () {
 			width: bounds.width,
 			height: bounds.height,
 			maximized: mainWindow.isMaximized()
+		});
+
+		storage.set("lastConnectionState", {
+			servers: 'vas'
 		});
 	});
 

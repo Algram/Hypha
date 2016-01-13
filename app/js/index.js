@@ -60,20 +60,21 @@ $('.modal .modalClose').click(function (e) {
 
 $('#addServer').click(function(e) {
 	let serverAddress = $('#serverInput').val();
-	$('.modal select').append('<option>' + serverAddress + '</option>');
+	let serverExists = $('select:contains("' + serverAddress + '")' ).length > 0 ;
+	if (!serverExists) {
+		let username = $('#nickInput').val();
 
-	let username = $('#nickInput').val();
-	console.log(serverAddress, username);
+		$('.modal select').append('<option>' + serverAddress + '</option>');
 
-	ipcRenderer.send('serverAdded', username, serverAddress);
+		ipcRenderer.send('serverAdded', username, serverAddress);
+	} else {
+		console.log('Server already added.');
+	}
 });
 
 $('#addChannel').click(function(e) {
-	//selectedServer
     let selServer = $('.modal select :selected').text();
-
-    //Add new channel
-    let newChannel = $('#channelInput').val();
+	let newChannel = $('#channelInput').val();
 
     ipcRenderer.send('channelAdded', selServer, newChannel);
 });
