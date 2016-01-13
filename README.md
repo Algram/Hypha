@@ -9,3 +9,10 @@ You install it with
 ```bash
 npm install && npm start
 ```
+or
+
+```bash
+sudo npm install -g electron-prebuilt
+cd directory/
+electron .
+```
