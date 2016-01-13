@@ -53,7 +53,7 @@ $('#titlebar').on('click', 'add',function (e) {
     }
 });
 
-$('.modal .modalClose').click(function (e) {
+$('.modal .close').click(function (e) {
 	$('body').toggleClass('prevent');
 	$('.modal').toggleClass('active');
 });
