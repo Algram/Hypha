@@ -26,6 +26,7 @@
     "electron-prebuilt": "^0.36.0"
   },
   "dependencies": {
-    "irc": "~0.4.0"
+    "irc": "~0.4.0",
+    "randomcolor": "~0.4.3"
   }
 }

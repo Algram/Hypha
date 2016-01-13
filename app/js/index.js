@@ -223,7 +223,7 @@ function appendMessage(address, message) {
 			insertStr = insertStr.insert(end, '</a>');
 		}
 
-		$('#messageArea line:last message').html(insertStr);
+		selChannel.find('line:last message').html(insertStr);
 	}
 
 	//Scroll to last appended message

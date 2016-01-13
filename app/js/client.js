@@ -86,7 +86,6 @@ class Client {
 	}
 
 	join(name) {
-		console.log(name);
 		this.client.join(name);
 	}
 
