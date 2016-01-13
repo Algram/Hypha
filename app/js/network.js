@@ -9,10 +9,15 @@ class Network {
 		this.clients = [];
 	}
 
-	addClient(nick, address) {
+	addClient(nick, address, options) {
 		//CLEANUP check for multiple adding of same client
 
-		let client = new irc.Client(nick, address);
+		let defaultOptions = {
+
+		}
+
+		let cleanOptions = Object.assign({}, defaultOptions, options);
+		let client = new irc.Client(nick, address, cleanOptions);
 		this.clients.push(client);
 
 		this.addListeners(client);

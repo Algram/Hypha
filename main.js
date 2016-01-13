@@ -66,7 +66,7 @@ app.on('ready', function () {
 	let network = new irc.Network('testnetwork');
 	//network.addClient('Testgram', 'irc.snoonet.org');
 	//network.addClient('helloworld16', 'irc.freenode.net');
-	network.addClient('helloworld167', 'irc.esper.net');
+	//network.addClient('helloworld167', 'irc.esper.net');
 
 	/*let c1 = network.getClient('irc.snoonet.org');
 	c1.addChannel('#supersecretproject');
@@ -83,11 +83,11 @@ app.on('ready', function () {
 	c2.addChannel('#arch');
 	c2.connect();*/
 
-	let c3 = network.getClient('irc.esper.net');
+	/*let c3 = network.getClient('irc.esper.net');
 	c3.addChannel('#linuxmasterrace');
 	c3.addChannel('#somechannelname123');
 	c3.addChannel('#anothernameforachannel');
-	c3.connect();
+	c3.connect();*/
 
 	network.on('channelData', function (address, channel) {
 		mainWindow.webContents.send('channelData', address, channel);
@@ -138,12 +138,17 @@ app.on('ready', function () {
 		event.sender.send('channelSelected_reply', address, selChannel, network.getClient(address).getNick());
 	});
 
-    ipcMain.on('channelAdded', function (event, adress, channelName) {
-        let selChannel = network.getClient(adress).addChannel(channelName);
+    ipcMain.on('channelAdded', function (event, address, channelName) {
+        let selChannel = network.getClient(address).addChannel(channelName);
 
         //TODO change this so not every channel reconnects
-        network.getClient(adress).join(channelName);
+        network.getClient(address).join(channelName);
     });
+
+	ipcMain.on('serverAdded', function (event, nick, address) {
+		network.addClient(nick, address);
+		network.getClient(address).connect();
+	});
 
 	// Open the DevTools.
 	mainWindow.webContents.openDevTools();

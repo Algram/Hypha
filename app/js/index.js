@@ -53,19 +53,31 @@ $('#titlebar').on('click', 'add',function (e) {
     }
 });
 
-$('.modal').on('click', 'button',function (e) {
+$('.modal .modalClose').click(function (e) {
 	$('body').toggleClass('prevent');
 	$('.modal').toggleClass('active');
+});
 
-    //selectedServer
+$('#addServer').click(function(e) {
+	let serverAddress = $('#serverInput').val();
+	$('.modal select').append('<option>' + serverAddress + '</option>');
+
+	let username = $('#nickInput').val();
+	console.log(serverAddress, username);
+
+	ipcRenderer.send('serverAdded', username, serverAddress);
+});
+
+$('#addChannel').click(function(e) {
+	//selectedServer
     let selServer = $('.modal select :selected').text();
 
     //Add new channel
     let newChannel = $('#channelInput').val();
 
     ipcRenderer.send('channelAdded', selServer, newChannel);
-
 });
+
 
 //////////////////////
 // Receiving Events //
