@@ -46,6 +46,8 @@ $('#titlebar').on('click', 'add',function (e) {
 	$('body').toggleClass('prevent');
 	$('.modal').toggleClass('active');
 
+	$('.modal select').empty();
+
     //testing
     for(let key in displayedServers) {
         let server = displayedServers[key];
@@ -208,8 +210,8 @@ function appendMessage(address, message) {
 		}
 	}
 
-	//Check if message contains links
-	let links = util.findLinks(messageEnc);
+	//Check if message contains links, use raw message and not encoded one
+	let links = util.findLinks(message.message);
 	if (links !== null) {
 		let insertStr = messageEnc;
 

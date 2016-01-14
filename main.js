@@ -12,6 +12,10 @@ const storage = require('./app/js/storage');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let appIcon = null;
+
+//Create the main network for the client
+let network = new irc.Network('testnetwork');
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
 	// On OS X it is common for applications and their menu bar
@@ -26,6 +30,7 @@ app.on('window-all-closed', function () {
 app.on('ready', function () {
 	// Initial createWindow
 	createWindow();
+	restoreState();
 
 	// Create a tray icon, GPL mock icon from http://www.iconarchive.com/show/captiva-icons-by-bokehlicia/chat-irc-icon.html
 	appIcon = new Tray('app/images/logo.png');
@@ -55,9 +60,6 @@ app.on('ready', function () {
 
 	// and load the index.html of the app.
 	mainWindow.loadURL('file://' + __dirname + '/app/index.html');
-
-	//Create the main network for the client
-	let network = new irc.Network('testnetwork');
 
 	network.on('channelData', function (address, channel) {
 		mainWindow.webContents.send('channelData', address, channel);
@@ -109,10 +111,7 @@ app.on('ready', function () {
 	});
 
     ipcMain.on('channelAdded', function (event, address, channelName) {
-        let selChannel = network.getClient(address).addChannel(channelName);
-
-        //TODO change this so not every channel reconnects
-        network.getClient(address).join(channelName);
+        network.getClient(address).addChannel(channelName);
     });
 
 	ipcMain.on('serverAdded', function (event, nick, address) {
@@ -134,7 +133,7 @@ app.on('ready', function () {
 	// Emitted when the window is being closed.
 	mainWindow.on('close', function () {
 		let bounds = mainWindow.getBounds();
-		storage.set("lastWindowState", {
+		storage.set('lastWindowState', {
 			x: bounds.x,
 			y: bounds.y,
 			width: bounds.width,
@@ -142,8 +141,30 @@ app.on('ready', function () {
 			maximized: mainWindow.isMaximized()
 		});
 
-		storage.set("lastConnectionState", {
-			servers: 'vas'
+		let clients = [];
+		let currClients = network.getAllClients();
+
+		for (let key in currClients) {
+			let currClient = currClients[key];
+			let client = {};
+			let nick = currClient.nick;
+			let address = currClient.address;
+			let channels = [];
+
+			for (let key in currClient.channels) {
+				let currChannel = currClient.channels[key];
+
+				channels.push(currChannel.name);
+			}
+
+			client.nick = nick;
+			client.address = address;
+			client.channels = channels;
+			clients.push(client);
+		}
+
+		storage.set('lastConnectionState', {
+			clients: clients
 		});
 	});
 
@@ -153,7 +174,7 @@ app.on('ready', function () {
 });
 
 function createWindow() {
-	let lastWindowState = storage.get("lastWindowState");
+	let lastWindowState = storage.get('lastWindowState');
 	if (lastWindowState === null) {
 		lastWindowState = {
 			width: 800,
@@ -176,5 +197,24 @@ function createWindow() {
 
 	if (lastWindowState.maximized) {
 		mainWindow.maximize();
+	}
+}
+
+function restoreState() {
+	let lastConnectionState = storage.get('lastConnectionState');
+
+	if (lastConnectionState !== null) {
+		let lastClients = lastConnectionState.clients;
+
+		for (let key in lastClients) {
+			let lastClient = lastClients[key];
+			network.addClient(lastClient.nick, lastClient.address);
+			network.getClient(lastClient.address).connect();
+
+			for (let key in lastClient.channels) {
+				let newChannel = lastClient.channels[key];
+				network.getClient(lastClient.address).addChannel(newChannel);
+			}
+		}
 	}
 }

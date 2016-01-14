@@ -33,6 +33,10 @@ class Network {
 		}
 	}
 
+	getAllClients() {
+		return this.clients;
+	}
+
 	addListeners(client) {
 		client.on('channelData', (address, channel) => {
 			this.emit('channelData', address, channel);

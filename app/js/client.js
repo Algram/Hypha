@@ -14,6 +14,7 @@ class Client {
 		this.client = new irc.Client(address, nick, {
 			autoConnect: false,
 			realName: 'irclean_wip',
+			debug: true
 		});
 
 		this.addListeners();
@@ -35,6 +36,8 @@ class Client {
 
 			// Add it to the collection.
 			this.channels.push(ircchannel);
+			console.log('name', name);
+			this.join(name);
 		}
 
 		// Return this object reference to allow for method chaining.
