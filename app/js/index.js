@@ -1,6 +1,9 @@
 'use strict';
 const ipcRenderer = require('electron').ipcRenderer;
 const util = require('./js/util');
+const remote = require('remote');
+const Menu = remote.require('menu');
+const MenuItem = remote.require('menu-item');
 
 let displayedServers = [];
 let selectedServer = '';
@@ -340,6 +343,17 @@ $('#titlebar').on('click', 'close', function (e) {
 	e.preventDefault();
 	ipcRenderer.send('closeWindow');
 })
+
+let menu = new Menu();
+menu.append(new MenuItem({ label: 'Remove', click: function(e, e2, e3) {
+	console.log('item 1 clicked', e, e2, e3);
+	console.log($(this).text());
+}}));
+
+window.addEventListener('contextmenu', function (e) {
+  e.preventDefault();
+  menu.popup(remote.getCurrentWindow());
+}, false);
 
 /**
  * Insert string into string at specified index
