@@ -114,7 +114,7 @@ function updateScrollState() {
 This uses a permissive regex to find urls in a string
  */
 function findLinks(str) {
-	let pattern = /\b(?:[a-z]{2,}?:\/\/)?[^\s/]+\.\w{2,}(?::\d{1,5})?(?:\/[^\s]*\b|\b)(?![:.?#]\S)/gi;
+	let pattern = /\b(?:[a-z]{2,}?:\/\/)?([^\s./]+\.)+[^\d\s./:?]\w+(?::\d{1,5})?(?:\/[^\s]*\b|\b)(?![:.?#]\S)/gi;
 
 	return str.match(pattern);
 }
