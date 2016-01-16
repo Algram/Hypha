@@ -123,6 +123,10 @@ app.on('ready', function () {
 		network.getClient(address).connect();
 	});
 
+	ipcMain.on('usernameChanged', function (event, address, nick) {
+		network.getClient(address).changeNick(nick);
+	});
+
 	// Open the DevTools.
 	mainWindow.webContents.openDevTools();
 

@@ -83,6 +83,11 @@ class Client {
 		return this.selectedChannel;
 	}
 
+	changeNick(newNick) {
+		this.client.send('NICK', newNick);
+		this.nick = newNick;
+	}
+
 	getNick(name) {
 		return this.nick;
 	}
