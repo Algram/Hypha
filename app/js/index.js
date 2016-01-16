@@ -356,6 +356,7 @@ $("#messageInput").keydown(function (e) {
 	if (e.keyCode == 9) {
 		e.preventDefault();
 
+		let messageInput = $("#messageInput");
 		let inputContent = $(this).val();
 		let lastWord = inputContent.split(' ').pop();
 
@@ -365,10 +366,13 @@ $("#messageInput").keydown(function (e) {
 					0, inputContent.lastIndexOf(" "));
 
 				if (cachedContent === '') {
-					$("#messageInput").val(name + ': ');
+					messageInput.val(name + ': ');
 				} else {
-					$("#messageInput").val(cachedContent + ' ' + name);
+					messageInput.val(cachedContent + ' ' + name);
 				}
+
+				//Scroll to the right in case the input field is long
+				messageInput[0].scrollLeft = messageInput[0].scrollWidth;
 			})
 		}
 	}
