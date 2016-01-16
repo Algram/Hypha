@@ -182,19 +182,21 @@ class Client {
 			for (let key in this.channels) {
 				let channel = this.channels[key];
 
-				//Add this message to every channel
-				let message = {
-					from: nick,
-					to: channel.getName(),
-					message: nick + ' quit. ' + '(' + reason + ')',
-					event: true,
-					action: false
+				if (channel.users.indexOf(nick) > -1) {
+					//Add this message to every channel, if user exists in it
+					let message = {
+						from: nick,
+						to: channel.getName(),
+						message: nick + ' quit. ' + '(' + reason + ')',
+						event: true,
+						action: false
+					}
+
+					channel.removeUser(nick);
+					channel.addMessage(message);
+
+					this.emit('messageReceived', this.address, message);
 				}
-
-				channel.removeUser(nick);
-				channel.addMessage(message);
-
-				this.emit('messageReceived', this.address, message);
 			}
 		});
 
