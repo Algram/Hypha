@@ -75,6 +75,7 @@ function encodeEntities(value) {
 }
 
 function stringToColour(str) {
+	let colorsExtrapol = [];
 	let colors = [
 		'#b58900','#af8700','#cb4b16','#d75f00',
 		'#d33682','#af005f','#6c71c4','#5f5faf',
@@ -82,22 +83,20 @@ function stringToColour(str) {
 		'#859900','#5f8700'
 	]
 
-	let initialLength = colors.length;
-
-	for (let i = 0; i < initialLength; i++) {
+	for (let i = 0; i < colors.length; i++) {
 		let hsvColor = please.HEX_to_HSV(colors[i]);
 		let scheme = please.make_scheme(hsvColor, {
 			scheme_type: 'split-complementary',
 			format: 'hex'
 		})
 
-		colors = colors.concat(scheme);
+		colorsExtrapol = colorsExtrapol.concat(scheme);
 	}
 
 	let hashCode = str.hashCode();
-	let number = Math.abs(hashCode % colors.length);
+	let number = Math.abs(hashCode % colorsExtrapol.length);
 
-	return colors[number];
+	return colorsExtrapol[number];
 }
 
 /*
