@@ -13,9 +13,23 @@ let selectedUsername;
 
 initializeMenus();
 function initializeMenus() {
-	let menu = new Menu();
+	//TEXT EDIT MENU
+	let textMenu = Menu.buildFromTemplate([{
+	        label: 'Copy',
+	        role: 'copy',
+	    }
+	]);
+
+	$('#messageArea').on('contextmenu', 'line', function (e) {
+		e.preventDefault();
+		textMenu.popup(remote.getCurrentWindow());
+	})
+
+
+	//CHANNEL REMOVE MENU
+	let channelMenu = new Menu();
 	let elementTargeted;
-	menu.append(new MenuItem({ label: 'Remove', click: function() {
+	channelMenu.append(new MenuItem({ label: 'Remove', click: function() {
 		let serverName = elementTargeted.siblings('name').text();
 		let channelName = elementTargeted.text();
 
@@ -38,7 +52,7 @@ function initializeMenus() {
 	$('#channelList').on('contextmenu', 'channel', function (e) {
 		e.preventDefault();
 		elementTargeted = $(this);
-		menu.popup(remote.getCurrentWindow());
+		channelMenu.popup(remote.getCurrentWindow());
 	})
 }
 
