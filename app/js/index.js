@@ -395,6 +395,17 @@ $('#titlebar').on('click', 'close', function (e) {
 })
 
 /**
+ * Add tooltip for overflow elements
+ */
+$(document).on('mouseover', 'nick', function () {
+    var $this = $(this);
+	
+    if(this.offsetWidth < this.scrollWidth && !$this.attr('title')){
+        $this.attr('title', $this.text());
+    }
+});
+
+/**
  * Insert string into string at specified index
  */
 String.prototype.insert = function (index, string) {
