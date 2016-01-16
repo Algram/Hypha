@@ -224,6 +224,22 @@ class Client {
 			}
 		});
 
+		this.client.addListener('nick', (oldNick, newNick, channels, messageObj) => {
+			for (let key in this.channels) {
+				let channel = this.channels[key];
+
+				let message = {
+					from: newNick,
+					to: channel.getName(),
+					message: oldNick + ' is now ' + newNick,
+					event: true,
+					action: false
+				}
+
+				this.emit('messageReceived', this.address, message);
+			}
+		});
+
 		this.client.addListener('notice', function (nick, to, text, message) {
 			console.log('NOTICE: ', nick, to, text, message);
 		});
