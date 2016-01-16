@@ -45,6 +45,20 @@ class Client {
 		return (this);
 	}
 
+	removeChannel(name) {
+		for (let key in this.channels) {
+			let selChannel = this.channels[key];
+
+			if (selChannel.getName() === name) {
+				this.channels.splice(key, 1);
+				this.client.part(name);
+			}
+		}
+
+		// Return this object reference to allow for method chaining.
+		return (this);
+	}
+
 	getChannel(name) {
 		for (let key in this.channels) {
 			let channel = this.channels[key];
@@ -155,25 +169,28 @@ class Client {
 
 			    channel.addUser(nick);
 			    channel.addMessage(message);
-			    this.emit('messageReceived', this.address, message);
+
+				this.emit('messageReceived', this.address, message);
 			}
 		});
 
 		this.client.addListener('part', (channelName, nick, reason, messageObj) => {
-			let channel = this.getChannel(channelName);
+			if (nick !== this.nick) {
+				let channel = this.getChannel(channelName);
 
-			let message = {
-				from: nick,
-				to: channelName,
-				message: nick + ' left. ' + '(' + reason + ')',
-				event: true,
-				action: false
+				let message = {
+					from: nick,
+					to: channelName,
+					message: nick + ' left. ' + '(' + reason + ')',
+					event: true,
+					action: false
+				}
+
+				channel.removeUser(nick);
+				channel.addMessage(message);
+
+				this.emit('messageReceived', this.address, message);
 			}
-
-			channel.removeUser(nick);
-			channel.addMessage(message);
-
-			this.emit('messageReceived', this.address, message);
 		});
 
 		//BUGFIX atm get's added to every open channel, even if person
@@ -184,20 +201,26 @@ class Client {
 
 				if (channel.users.indexOf(nick) > -1) {
 					//Add this message to every channel, if user exists in it
-					let message = {
-						from: nick,
-						to: channel.getName(),
-						message: nick + ' quit. ' + '(' + reason + ')',
-						event: true,
-						action: false
+					if (nick !== this.nick) {
+						let message = {
+							from: nick,
+							to: channel.getName(),
+							message: nick + ' quit. ' + '(' + reason + ')',
+							event: true,
+							action: false
+						}
+
+						channel.removeUser(nick);
+						channel.addMessage(message);
+
+						this.emit('messageReceived', this.address, message);
 					}
-
-					channel.removeUser(nick);
-					channel.addMessage(message);
-
-					this.emit('messageReceived', this.address, message);
 				}
 			}
+		});
+
+		this.client.addListener('notice', function (nick, to, text, message) {
+			console.log('NOTICE: ', nick, to, text, message);
 		});
 
 		/*

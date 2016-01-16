@@ -1,7 +1,7 @@
 'use strict';
-const ipcRenderer = require('electron').ipcRenderer;
-const util = require('./js/util');
 const please = require('./external/Please');
+const util = require('./js/util');
+const ipcRenderer = require('electron').ipcRenderer;
 const remote = require('remote');
 const Menu = remote.require('menu');
 const MenuItem = remote.require('menu-item');
@@ -10,6 +10,37 @@ let displayedServers = [];
 let selectedServer = '';
 let selectedChannel;
 let selectedUsername;
+
+initializeMenus();
+function initializeMenus() {
+	let menu = new Menu();
+	let elementTargeted;
+	menu.append(new MenuItem({ label: 'Remove', click: function() {
+		let serverName = elementTargeted.siblings('name').text();
+		let channelName = elementTargeted.text();
+
+		for (let key in displayedServers) {
+			let server = displayedServers[key];
+
+			if (server.address == serverName) {
+				let indexOfChannel = server.channels.indexOf(channelName);
+				if (indexOfChannel > -1) {
+					server.channels.splice(indexOfChannel, 1);
+				}
+			}
+		}
+
+		elementTargeted.remove();
+
+		ipcRenderer.send('channelRemoved', serverName, channelName);
+	}}));
+
+	$('#channelList').on('contextmenu', 'channel', function (e) {
+		e.preventDefault();
+		elementTargeted = $(this);
+		menu.popup(remote.getCurrentWindow());
+	})
+}
 
 /*
 New channel was selected, tell main and trigger visual changes
@@ -344,17 +375,6 @@ $('#titlebar').on('click', 'close', function (e) {
 	e.preventDefault();
 	ipcRenderer.send('closeWindow');
 })
-
-let menu = new Menu();
-menu.append(new MenuItem({ label: 'Remove', click: function(e, e2, e3) {
-	console.log('item 1 clicked', e, e2, e3);
-	console.log($(this).text());
-}}));
-
-window.addEventListener('contextmenu', function (e) {
-  e.preventDefault();
-  menu.popup(remote.getCurrentWindow());
-}, false);
 
 /**
  * Insert string into string at specified index

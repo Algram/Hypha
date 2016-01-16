@@ -5,7 +5,6 @@
   "asi": true,
   "globals": {
       "Notification": false,
-      "document": false,
-      "Please": false
+      "document": false
   }
 }
