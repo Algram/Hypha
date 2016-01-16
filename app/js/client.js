@@ -228,15 +228,17 @@ class Client {
 			for (let key in this.channels) {
 				let channel = this.channels[key];
 
-				let message = {
-					from: newNick,
-					to: channel.getName(),
-					message: oldNick + ' is now ' + newNick,
-					event: true,
-					action: false
-				}
+				if (channel.users.indexOf(oldNick) > -1) {
+					let message = {
+						from: newNick,
+						to: channel.getName(),
+						message: oldNick + ' is now ' + newNick,
+						event: true,
+						action: false
+					}
 
-				this.emit('messageReceived', this.address, message);
+					this.emit('messageReceived', this.address, message);
+				}
 			}
 		});
 
