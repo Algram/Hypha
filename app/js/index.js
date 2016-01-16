@@ -169,7 +169,7 @@ ipcRenderer.on('messageReceived', function (event, address, message) {
 			//Make messages of now selectedChannel visible, hide all others
 			//TODO code-duplication
 			$("#messageArea server").children('channel').css('display', 'none');
-			let selServer = $('[name="' + address + '"]');
+			let selServer = $('[name="' + selectedServer + '"]');
 			let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
 			selChannel.css('display', 'block');
 		} else {

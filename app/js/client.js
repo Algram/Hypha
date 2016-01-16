@@ -14,7 +14,8 @@ class Client {
 		this.client = new irc.Client(address, nick, {
 			autoConnect: false,
 			realName: 'irclean_wip',
-			debug: true
+			debug: true,
+			autoRejoin: true
 		});
 
 		this.addListeners();
@@ -141,7 +142,7 @@ class Client {
 
 		this.client.addListener('join', (channelName, nick, messageObj) => {
 			//Filter out own join message
-			/*if (nick !== this.nick) {
+			if (nick !== this.nick) {
 			    let channel = this.getChannel(channelName);
 
 			    let message = {
@@ -154,8 +155,8 @@ class Client {
 
 			    channel.addUser(nick);
 			    channel.addMessage(message);
-			    //this.emit('messageReceived', this.address, message);
-			}*/
+			    this.emit('messageReceived', this.address, message);
+			}
 		});
 
 		this.client.addListener('part', (channelName, nick, reason, messageObj) => {
@@ -172,7 +173,7 @@ class Client {
 			channel.removeUser(nick);
 			channel.addMessage(message);
 
-			//this.emit('messageReceived', this.address, message);
+			this.emit('messageReceived', this.address, message);
 		});
 
 		//BUGFIX atm get's added to every open channel, even if person
@@ -193,7 +194,7 @@ class Client {
 				channel.removeUser(nick);
 				channel.addMessage(message);
 
-				//this.emit('messageReceived', this.address, message);
+				this.emit('messageReceived', this.address, message);
 			}
 		});
 
