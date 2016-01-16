@@ -132,6 +132,7 @@ app.on('ready', function () {
 
 	// Emitted when the window is being closed.
 	mainWindow.on('close', function () {
+		//Set lastWindowState
 		let bounds = mainWindow.getBounds();
 		storage.set('lastWindowState', {
 			x: bounds.x,
@@ -141,6 +142,7 @@ app.on('ready', function () {
 			maximized: mainWindow.isMaximized()
 		});
 
+		//Set lastConnectionState
 		let clients = [];
 		let currClients = network.getAllClients();
 

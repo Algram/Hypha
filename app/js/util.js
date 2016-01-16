@@ -75,17 +75,29 @@ function encodeEntities(value) {
 }
 
 function stringToColour(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    var colour = '#';
+	let colors = [
+		'#b58900','#af8700','#cb4b16','#d75f00',
+		'#d33682','#af005f','#6c71c4','#5f5faf',
+		'#268bd2','#0087ff','#2aa198','#00afaf',
+		'#859900','#5f8700'
+	]
 
-    for (let i = 0; i < 3; i++) {
-        let value = (hash >> (i * 8)) & 0xFF;
-        colour += ('00' + value.toString(16)).substr(-2);
-    }
-    return colour;
+	let initialLength = colors.length;
+
+	for (let i = 0; i < initialLength; i++) {
+		let hsvColor = please.HEX_to_HSV(colors[i]);
+		let scheme = please.make_scheme(hsvColor, {
+			scheme_type: 'split-complementary',
+			format: 'hex'
+		})
+
+		colors = colors.concat(scheme);
+	}
+
+	let hashCode = str.hashCode();
+	let number = Math.abs(hashCode % colors.length);
+
+	return colors[number];
 }
 
 /*

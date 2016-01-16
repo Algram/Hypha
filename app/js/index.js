@@ -1,6 +1,7 @@
 'use strict';
 const ipcRenderer = require('electron').ipcRenderer;
 const util = require('./js/util');
+const please = require('./external/Please');
 const remote = require('remote');
 const Menu = remote.require('menu');
 const MenuItem = remote.require('menu-item');
@@ -363,6 +364,20 @@ String.prototype.insert = function (index, string) {
 		return this.substring(0, index) + string + this.substring(index, this.length);
 	else
 		return string + this;
+};
+
+/**
+ * Returns a 32bit-int hashcode of a string
+ */
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr, len;
+  if (this.length === 0) return hash;
+  for (i = 0, len = this.length; i < len; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
 };
 
 /**
