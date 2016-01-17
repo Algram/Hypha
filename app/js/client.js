@@ -37,7 +37,6 @@ class Client {
 
 			// Add it to the collection.
 			this.channels.push(ircchannel);
-			console.log('name', name);
 			this.join(name);
 		}
 
@@ -227,8 +226,15 @@ class Client {
 		this.client.addListener('nick', (oldNick, newNick, channels, messageObj) => {
 			for (let key in this.channels) {
 				let channel = this.channels[key];
+				let users = Object.keys(channel.users[0]);
 
-				if (channel.users.indexOf(oldNick) > -1) {
+				console.log(oldNick, newNick);
+				console.log(users);
+				console.log(users.indexOf(oldNick));
+				console.log(users.indexOf(newNick));
+				console.log(channels);
+
+				if (users.indexOf(oldNick) > -1 || users.indexOf(newNick) > -1) {
 					let message = {
 						from: newNick,
 						to: channel.getName(),
