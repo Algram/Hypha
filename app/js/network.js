@@ -51,6 +51,10 @@ class Network {
 				this.emit('userlistChanged', address, channel);
 			}
 		})
+
+		client.on('pmReceived', (address, nick, text) => {
+			this.emit('pmReceived', address, nick, text);
+		})
 	}
 
 }

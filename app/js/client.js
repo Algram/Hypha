@@ -246,6 +246,11 @@ class Client {
 			console.log('NOTICE: ', nick, to, text, message);
 		});
 
+		this.client.addListener('pm', function (nick, text, message) {
+			console.log('PRIVATEM: ', nick, text, message);
+			this.emit('pmReceived', this.address, nick, text);
+		});
+
 		/*
 		Listening to errors, otherwise the program will exit on error
 		 */

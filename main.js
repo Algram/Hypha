@@ -69,6 +69,10 @@ app.on('ready', function () {
 		mainWindow.webContents.send('messageReceived', address, message);
 	})
 
+	network.on('pmReceived', function (address, nick, text) {
+		mainWindow.webContents.send('pmReceived', address, nick, text);
+	})
+
 	network.on('userlistChanged', function (address, channel) {
 		mainWindow.webContents.send('userlistChanged', address, channel);
 	})

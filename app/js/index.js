@@ -91,6 +91,16 @@ ipcRenderer.on('channelSelected_reply', function (event, address, channel, usern
 	util.updateScrollState();
 });
 
+ipcRenderer.on('userlistChanged', function (event, address, channel) {
+	console.log('fired');
+	console.log(channel.users);
+	util.fillUsermenu(channel.users);
+});
+
+ipcRenderer.on('pmReceived', function (address, nick, text) {
+
+});
+
 $('#titlebar').on('click', 'add',function (e) {
 	$('body').toggleClass('prevent');
 	$('.modal').toggleClass('active');
