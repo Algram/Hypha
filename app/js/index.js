@@ -352,6 +352,15 @@ $("#usernameInput").keydown(function (e) {
 /*
 Tab was pressed, autocomplete word to next username match
  */
+$("#messageInput").keyup(function (e) {
+	if (e.keyCode == 9) {
+		e.preventDefault();
+	}
+});
+
+/*
+Tab was pressed, autocomplete word to next username match
+ */
 $("#messageInput").keydown(function (e) {
 	if (e.keyCode == 9) {
 		e.preventDefault();
@@ -399,7 +408,7 @@ $('#titlebar').on('click', 'close', function (e) {
  */
 $(document).on('mouseover', 'nick', function () {
     var $this = $(this);
-	
+
     if(this.offsetWidth < this.scrollWidth && !$this.attr('title')){
         $this.attr('title', $this.text());
     }

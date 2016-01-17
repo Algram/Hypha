@@ -228,12 +228,6 @@ class Client {
 				let channel = this.channels[key];
 				let users = Object.keys(channel.users[0]);
 
-				console.log(oldNick, newNick);
-				console.log(users);
-				console.log(users.indexOf(oldNick));
-				console.log(users.indexOf(newNick));
-				console.log(channels);
-
 				if (users.indexOf(oldNick) > -1 || users.indexOf(newNick) > -1) {
 					let message = {
 						from: newNick,
