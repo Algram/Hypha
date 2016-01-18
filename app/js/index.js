@@ -92,7 +92,9 @@ ipcRenderer.on('channelSelected_reply', function (event, address, channel, usern
 });
 
 ipcRenderer.on('userlistChanged', function (event, address, channel) {
-	util.fillUsermenu(channel.users);
+	if (selectedServer === address && selectedChannel.name === channel.name) {
+		util.fillUsermenu(channel.users);
+	}
 });
 
 ipcRenderer.on('pmReceived', function (address, nick, text) {
@@ -233,6 +235,7 @@ ipcRenderer.on('messageReceived', function (event, address, message) {
 		appendMessage(address, message);
 
 	} else if (message.event === true) {
+		console.log(message);
 		//This message is an event
 		appendEvent(address, message);
 
@@ -342,16 +345,27 @@ $("#messageInput").keydown(function (e) {
 		let messageContent = $(this).val();
 
 		if (messageContent !== '') {
-			let message = {
-				from: selectedUsername,
-				to: selectedChannel.name,
-				message: messageContent
+			if (messageContent[0] === '/') {
+				//This is a command, parse it and send it
+				$(this).val('');
+
+				let command = messageContent.substring(1).split(' ', 1)[0];
+				let args = messageContent.substring(command.length + 2);
+
+				ipcRenderer.send('commandSent', selectedServer,
+					selectedChannel, command, args);
+			} else {
+				let message = {
+					from: selectedUsername,
+					to: selectedChannel.name,
+					message: messageContent
+				}
+
+				$(this).val('');
+
+				appendMessage(selectedServer, message);
+				ipcRenderer.send('messageSent', selectedServer, message.message);
 			}
-
-			$(this).val('');
-
-			appendMessage(selectedServer, message);
-			ipcRenderer.send('messageSent', selectedServer, message.message);
 		}
 	}
 });
@@ -394,7 +408,9 @@ $("#messageInput").keydown(function (e) {
 		let lastWord = inputContent.split(' ').pop();
 
 		if (inputContent !== '') {
-			util.autocomplete(lastWord, selectedChannel.users[0], function (name) {
+			let usersClean = selectedChannel.users.map(user => user.name);
+
+			util.autocomplete(lastWord, usersClean, function (name) {
 				let cachedContent = inputContent.substring(
 					0, inputContent.lastIndexOf(" "));
 

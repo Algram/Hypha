@@ -85,8 +85,26 @@ app.on('ready', function () {
 	They renderer wants to send a message and fires the event for it
 	that contains the message content
 	 */
-	ipcMain.on('messageSent', function (event, adress, messageContent) {
-		let selChannel = network.getClient(adress).getSelectedChannel();
+	ipcMain.on('messageSent', function (event, address, messageContent) {
+		let selChannel = network.getClient(address).getSelectedChannel();
+
+		let message = {
+			from: network.getClient(address).getNick(),
+			to: selChannel.getName(),
+			message: messageContent,
+			event: false,
+			action: false
+		}
+
+		//Add message to selected channel
+		selChannel.addMessage(message);
+
+		//Tell the client to send the message to its channel
+		network.getClient(address).say(message.to, message.message);
+	});
+
+	ipcMain.on('commandSent', function (event, address, command, args) {
+		/*let selChannel = network.getClient(address).getSelectedChannel();
 
 		let message = {
 			from: network.getClient(adress).getNick(),
@@ -100,7 +118,7 @@ app.on('ready', function () {
 		selChannel.addMessage(message);
 
 		//Tell the client to send the message to its channel
-		network.getClient(adress).say(message.to, message.message);
+		network.getClient(address).say(message.to, message.message);*/
 	});
 
 	/*

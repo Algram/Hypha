@@ -261,12 +261,18 @@ class Client {
 
 		//TODO add rank and not only empty string
 		this.client.addListener('nick', (oldNick, newNick, channels, messageObj) => {
+			let changedUser = false;
+
 			for (let key in this.channels) {
 				let channel = this.channels[key];
 				let users = channel.users;
 
-				channel.removeUser(oldNick);
-				channel.addUser({name: newNick, rank: ''});
+				//Only execute once to prevent multiple message-events
+				if (!changedUser) {
+					changedUser = true;
+					channel.removeUser(oldNick);
+					channel.addUser({name: newNick, rank: ''});
+				}
 
 				for (let key in users) {
 					let user = users[key];

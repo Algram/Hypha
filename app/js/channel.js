@@ -8,8 +8,20 @@ class Channel {
 	}
 
 	addUser(user) {
-		// Add it to the collection.
-		this.users.push(user);
+		let exists = false;
+
+		for (let key in this.users) {
+			let name = this.users[key].name;
+
+			if (user.name === name) {
+				exists = true;
+			}
+		}
+
+		if (!exists) {
+			// Add it to the collection.
+			this.users.push(user);
+		}
 
 		// Return this object reference to allow for method chaining.
 		return (this);
@@ -20,11 +32,11 @@ class Channel {
 	}
 
 	removeUser(nick) {
-		for (let i = 0; i < this.users.length; i++) {
-			let name = this.users[i].name;
+		for (let key in this.users) {
+			let name = this.users[key].name;
 
 			if (nick === name) {
-				this.users.splice(i, 1);
+				this.users.splice(key, 1);
 			}
 		}
 

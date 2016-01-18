@@ -5,9 +5,7 @@ const shell = require('shell');
 /*
 TODO add returning of multiple names, not just the first match
  */
-function autocomplete(str, names, callback) {
-	let users = Object.keys(names);
-
+function autocomplete(str, users, callback) {
 	for (let key in users) {
 		let user = users[key];
 		user = user.split(':')[0];
