@@ -235,6 +235,10 @@ ipcRenderer.on('messageReceived', function (event, address, message) {
 	} else if (message.event === true) {
 		//This message is an event
 		appendEvent(address, message);
+
+	} else if (message.action === true) {
+		//This message is an event
+		appendAction(address, message);
 	}
 });
 
@@ -292,6 +296,19 @@ function appendMessage(address, message) {
 function appendEvent(address, message) {
 	console.log(address, message);
 	let line = '<line><event>' + message.message + '</event></line>';
+
+	let selServer = $('[name="' + address + '"]');
+	let selChannel = selServer.children('[name="' + message.to + '"]');
+
+	selChannel.append(line);
+
+	//Scroll to last appended message
+	util.updateScrollState();
+}
+
+function appendAction(address, message) {
+	console.log(address, message);
+	let line = '<line><action>' + message.message + '</action></line>';
 
 	let selServer = $('[name="' + address + '"]');
 	let selChannel = selServer.children('[name="' + message.to + '"]');

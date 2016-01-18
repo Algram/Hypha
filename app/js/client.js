@@ -239,6 +239,26 @@ class Client {
 			}
 		});
 
+		this.client.addListener('action', (from, to, text, messageObj) => {
+			let message = {
+				from: from,
+				to: to,
+				message: text,
+				event: false,
+				action: true
+			}
+
+			for (let key in this.channels) {
+				let channel = this.channels[key];
+
+				if (channel.getName() == message.to) {
+					//Add the message to the channel object
+					channel.addMessage(message);
+					this.emit('messageReceived', this.address, message);
+				}
+			}
+		});
+
 		//TODO add rank and not only empty string
 		this.client.addListener('nick', (oldNick, newNick, channels, messageObj) => {
 			for (let key in this.channels) {
