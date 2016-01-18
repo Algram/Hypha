@@ -128,7 +128,18 @@ class Client {
 					let selChannel = this.channels[key];
 
 					if (selChannel.getName() == channelName) {
-						selChannel.addUsers(channelUsers);
+						for (let key in channelUsers) {
+							let name = key;
+							let rank = channelUsers[key];
+
+							let user = {
+								name: name,
+								rank: rank
+							}
+
+							selChannel.addUser(user);
+						}
+
 						this.emit('channelData', this.address, selChannel);
 					}
 				}
@@ -171,7 +182,12 @@ class Client {
 			        action: false
 			    }
 
-			    channel.addUser(nick);
+				let user = {
+					name: nick,
+					rank: ''
+				}
+
+			    channel.addUser(user);
 			    channel.addMessage(message);
 
 				this.emit('messageReceived', this.address, message);
@@ -223,27 +239,34 @@ class Client {
 			}
 		});
 
+		//TODO add rank and not only empty string
 		this.client.addListener('nick', (oldNick, newNick, channels, messageObj) => {
 			for (let key in this.channels) {
 				let channel = this.channels[key];
-				let users = Object.keys(channel.users[0]);
+				let users = channel.users;
 
-				if (users.indexOf(oldNick) > -1 || users.indexOf(newNick) > -1) {
-					let message = {
-						from: newNick,
-						to: channel.getName(),
-						message: oldNick + ' is now ' + newNick,
-						event: true,
-						action: false
+				channel.removeUser(oldNick);
+				channel.addUser({name: newNick, rank: ''});
+
+				for (let key in users) {
+					let user = users[key];
+					if (user.name === oldNick || user.name === newNick) {
+						let message = {
+							from: newNick,
+							to: channel.getName(),
+							message: oldNick + ' is now ' + newNick,
+							event: true,
+							action: false
+						}
+
+						this.emit('messageReceived', this.address, message);
 					}
-
-					this.emit('messageReceived', this.address, message);
 				}
 			}
 		});
 
 		this.client.addListener('notice', function (nick, to, text, message) {
-			console.log('NOTICE: ', nick, to, text, message);
+			//console.log('NOTICE: ', nick, to, text, message);
 		});
 
 		this.client.addListener('pm', function (nick, text, message) {

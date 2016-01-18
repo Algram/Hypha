@@ -7,14 +7,6 @@ class Channel {
 		this.messages = [];
 	}
 
-	addUsers(users) {
-		// Add it to the collection.
-		this.users.push(users);
-
-		// Return this object reference to allow for method chaining.
-		return (this);
-	}
-
 	addUser(user) {
 		// Add it to the collection.
 		this.users.push(user);
@@ -27,11 +19,13 @@ class Channel {
 		return this.users;
 	}
 
-	removeUser(user) {
-		let index = this.users.indexOf(user);
+	removeUser(nick) {
+		for (let i = 0; i < this.users.length; i++) {
+			let name = this.users[i].name;
 
-		if (index > -1) {
-			this.users.splice(index, 1);
+			if (nick === name) {
+				this.users.splice(i, 1);
+			}
 		}
 
 		// Return this object reference to allow for method chaining.

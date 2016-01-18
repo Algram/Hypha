@@ -92,8 +92,6 @@ ipcRenderer.on('channelSelected_reply', function (event, address, channel, usern
 });
 
 ipcRenderer.on('userlistChanged', function (event, address, channel) {
-	console.log('fired');
-	console.log(channel.users);
 	util.fillUsermenu(channel.users);
 });
 
@@ -292,6 +290,7 @@ function appendMessage(address, message) {
 }
 
 function appendEvent(address, message) {
+	console.log(address, message);
 	let line = '<line><event>' + message.message + '</event></line>';
 
 	let selServer = $('[name="' + address + '"]');

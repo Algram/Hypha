@@ -19,19 +19,16 @@ function autocomplete(str, names, callback) {
 	}
 }
 
-function fillUsermenu(usersObj) {
+//TODO add rank
+function fillUsermenu(usersArr) {
 	$('usermenu users').empty();
 
-	let users = Object.keys(usersObj[0]);
-
-	for (let key in users) {
-		let user = users[key];
-		user = user.split(':')[0];
-
-		$('usermenu users').append('<user>' + user + '</user>');
+	for (let key in usersArr) {
+		let user = usersArr[key];
+		$('usermenu users').append('<user>' + user.name + '</user>');
 	}
 
-	$('usermenu').attr('data-before', users.length);
+	$('usermenu').attr('data-before', usersArr.length);
 }
 
 /**
