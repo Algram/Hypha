@@ -182,6 +182,7 @@ a:hover {
 
 line {
   display: flex;
+  padding: 2px 0;
 }
 
 timestamp {
@@ -206,6 +207,13 @@ message {
 event {
     display: block;
     margin-left: auto;
+    color: rgb(160, 160, 160);
+}
+
+action {
+    display: block;
+    margin-right: auto;
+    font-style: italic;
     color: rgb(160, 160, 160);
 }
 

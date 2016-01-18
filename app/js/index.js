@@ -294,7 +294,6 @@ function appendMessage(address, message) {
 }
 
 function appendEvent(address, message) {
-	console.log(address, message);
 	let line = '<line><event>' + message.message + '</event></line>';
 
 	let selServer = $('[name="' + address + '"]');
@@ -307,8 +306,7 @@ function appendEvent(address, message) {
 }
 
 function appendAction(address, message) {
-	console.log(address, message);
-	let line = '<line><action>' + message.message + '</action></line>';
+	let line = '<line><action>' + message.from + ' ' + message.message + '</action></line>';
 
 	let selServer = $('[name="' + address + '"]');
 	let selChannel = selServer.children('[name="' + message.to + '"]');
