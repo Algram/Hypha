@@ -91,6 +91,10 @@ class Client {
 		this.client.say(channel, message);
 	}
 
+	sendAction(target, message) {
+		this.client.action(target, message);
+	}
+
 	connect() {
 		let client = this.client;
 		let channels = this.channels;
@@ -239,6 +243,7 @@ class Client {
 		});
 
 		this.client.addListener('action', (from, to, text, messageObj) => {
+			console.log('BEEP');
 			let message = {
 				from: from,
 				to: to,

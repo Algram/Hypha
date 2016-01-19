@@ -139,7 +139,7 @@ $('#addServer').click(function(e) {
 
 		} else {
 			ipcRenderer.send('serverAdded', username, serverAddress);
-			
+
 			$('.modal select').append('<option>' + serverAddress + '</option>');
 		}
 	} else {
@@ -373,11 +373,22 @@ $("#messageInput").keydown(function (e) {
 				//This is a command, parse it and send it
 				$(this).val('');
 
-				let command = messageContent.substring(1).split(' ', 1)[0];
+				let command = messageContent.substring(1).split(' ', 1)[0].toUpperCase();
 				let args = messageContent.substring(command.length + 2);
 
-				ipcRenderer.send('commandSent', selectedServer,
-					selectedChannel, command, args);
+				if (command === 'ME') {
+					ipcRenderer.send('actionSent', selectedServer,
+						selectedChannel.name, args);
+
+					let message = {
+						from: selectedUsername,
+						to: selectedChannel.name,
+						message: args,
+					}
+
+					appendAction(selectedServer, message);
+				}
+
 			} else {
 				let message = {
 					from: selectedUsername,

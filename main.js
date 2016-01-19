@@ -103,22 +103,9 @@ app.on('ready', function () {
 		network.getClient(address).say(message.to, message.message);
 	});
 
-	ipcMain.on('commandSent', function (event, address, command, args) {
-		/*let selChannel = network.getClient(address).getSelectedChannel();
-
-		let message = {
-			from: network.getClient(adress).getNick(),
-			to: selChannel.getName(),
-			message: messageContent,
-			event: false,
-			action: false
-		}
-
-		//Add message to selected channel
-		selChannel.addMessage(message);
-
-		//Tell the client to send the message to its channel
-		network.getClient(address).say(message.to, message.message);*/
+	ipcMain.on('actionSent', function (event, address, target, message) {
+		let selClient = network.getClient(address);
+		selClient.sendAction(target, message);
 	});
 
 	/*
