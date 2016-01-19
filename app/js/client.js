@@ -213,13 +213,12 @@ class Client {
 			}
 		});
 
-		//BUGFIX atm get's added to every open channel, even if person
-		//wasn't in that
 		this.client.addListener('quit', (nick, reason, channels, messageObj) => {
 			for (let key in this.channels) {
 				let channel = this.channels[key];
+				let usersClean = channel.users.map(user => user.name);
 
-				if (channel.users.indexOf(nick) > -1) {
+				if (usersClean.indexOf(nick) > -1) {
 					//Add this message to every channel, if user exists in it
 					if (nick !== this.nick) {
 						let message = {

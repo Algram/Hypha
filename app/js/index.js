@@ -93,6 +93,7 @@ ipcRenderer.on('channelSelected_reply', function (event, address, channel, usern
 
 ipcRenderer.on('userlistChanged', function (event, address, channel) {
 	if (selectedServer === address && selectedChannel.name === channel.name) {
+		selectedChannel.users = channel.users;
 		util.fillUsermenu(channel.users);
 	}
 });
@@ -146,25 +147,6 @@ $('#addChannel').click(function(e) {
 //////////////////////
 
 ipcRenderer.on('channelData', function (event, address, channel) {
-	//First channel to arrive, add it
-	if (displayedServers.length < 1) {
-		let serverData = {
-			address: address,
-			channels: [channel.name]
-		}
-
-		displayedServers.push(serverData);
-
-		let line = '<server><name>' + address + '</name><channel>' +
-			channel.name + '</channel></server>';
-		$('#channelList').append(line);
-
-		//Add channel-tag to messageArea, refactor to also add server-tag
-		let msgLine = '<server name="' + address + '"><channel name="' +
-			channel.name + '"></channel></server>';
-		$('#messageArea').append(msgLine);
-	}
-
 	let serverExists = false;
 	for (let key in displayedServers) {
 		let server = displayedServers[key];
@@ -175,10 +157,25 @@ ipcRenderer.on('channelData', function (event, address, channel) {
 
 			if (server.channels.indexOf(channel.name) == -1) {
 				//Channel doesnt exist, add it to the server
-				server.channels.push(channel.name)
+				server.channels.push(channel.name);
 
 				let line = '<channel>' + channel.name + '</channel>';
-				$('server name:contains(' + address + ')').parent().append(line);
+				let selServerCL = $('server name:contains(' + address + ')').parent();
+
+				let toinsert = true;
+				selServerCL.children('channel').each(function() {
+					let item = $(this).text();
+					if(channel.name.toUpperCase() < item.toUpperCase()){
+						if(toinsert){
+							$(this).before(line);
+							toinsert = false;
+						}
+					}
+				});
+
+				if(toinsert){
+					selServerCL.append(line);
+				}
 
 				//Add channel-tag to messageArea, refactor to also add server-tag
 				let selServer = $('[name="' + address + '"]');
@@ -199,7 +196,21 @@ ipcRenderer.on('channelData', function (event, address, channel) {
 
 		let line = '<server><name>' + address + '</name><channel>' +
 			channel.name + '</channel></server>';
-		$('#channelList').append(line);
+
+		let toinsert = true;
+		$('#channelList').children('server').each(function() {
+			let item = $(this).children('name').text();
+			if(address.toUpperCase() < item.toUpperCase()){
+				if(toinsert){
+					$(this).before(line);
+					toinsert = false;
+				}
+			}
+		});
+
+		if(toinsert){
+			$('#channelList').append(line);
+		}
 
 		//Add channel-tag to messageArea, refactor to also add server-tag
 		let msgLine = '<server name="' + address + '"><channel name="' +

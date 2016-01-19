@@ -20,9 +20,10 @@ function autocomplete(str, users, callback) {
 //TODO add rank
 function fillUsermenu(usersArr) {
 	$('usermenu users').empty();
+	let sortedUsers = usersArr.sort();
 
-	for (let key in usersArr) {
-		let user = usersArr[key];
+	for (let key in sortedUsers) {
+		let user = sortedUsers[key];
 		$('usermenu users').append('<user>' + user.name + '</user>');
 	}
 
