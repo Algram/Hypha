@@ -5,18 +5,14 @@ const util = require('util');
 const events = require('events');
 
 class Client {
-	constructor(nick, address) {
+	constructor(nick, address, options) {
 		this.nick = nick;
 		this.address = address;
+		this.options = options;
 		this.channels = [];
 		this.selectedChannel = '';
 
-		this.client = new irc.Client(address, nick, {
-			autoConnect: false,
-			realName: 'irclean_wip',
-			debug: true,
-			autoRejoin: true
-		});
+		this.client = new irc.Client(address, nick, options);
 
 		this.addListeners();
 	}
@@ -105,6 +101,10 @@ class Client {
 				client.join(channel.getName());
 			}
 		});
+	}
+
+	disconnect(message) {
+		this.client.disconnect(message);
 	}
 
 	join(name) {

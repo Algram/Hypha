@@ -126,9 +126,22 @@ $('#addServer').click(function(e) {
 	if (!serverExists) {
 		let username = $('#nickInput').val();
 
-		$('.modal select').append('<option>' + serverAddress + '</option>');
+		if (serverAddress.indexOf(':') > -1) {
+			let arr = serverAddress.split(':');
+			let name = arr[0];
+			let port = arr[1];
 
-		ipcRenderer.send('serverAdded', username, serverAddress);
+			ipcRenderer.send('serverAdded', username, name, {
+				port: port
+			});
+
+			$('.modal select').append('<option>' + name + '</option>');
+
+		} else {
+			ipcRenderer.send('serverAdded', username, serverAddress);
+			
+			$('.modal select').append('<option>' + serverAddress + '</option>');
+		}
 	} else {
 		console.log('Server already added.');
 	}

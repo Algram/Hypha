@@ -140,8 +140,8 @@ app.on('ready', function () {
         network.getClient(address).removeChannel(channelName);
     });
 
-	ipcMain.on('serverAdded', function (event, nick, address) {
-		network.addClient(nick, address);
+	ipcMain.on('serverAdded', function (event, nick, address, options) {
+		network.addClient(nick, address, options);
 		network.getClient(address).connect();
 	});
 

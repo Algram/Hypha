@@ -13,7 +13,10 @@ class Network {
 		//CLEANUP check for multiple adding of same client
 
 		let defaultOptions = {
-
+			autoConnect: false,
+			realName: 'irclean_wip',
+			debug: true,
+			autoRejoin: true
 		}
 
 		let cleanOptions = Object.assign({}, defaultOptions, options);
