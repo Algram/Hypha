@@ -62,6 +62,10 @@ New channel was selected, tell main and trigger visual changes
 $('#channelList').on('click', 'channel', function (e) {
 	e.preventDefault();
 
+	//Enable input-fields
+
+	$("input").prop('disabled', false);
+
 	let serverAddress = $(this).siblings('name').text();
 
 	$('#channelList server channel').removeClass('selected');
@@ -160,6 +164,10 @@ $('#addChannel').click(function(e) {
 //////////////////////
 
 ipcRenderer.on('channelData', function (event, address, channel) {
+	if (selectedChannel === undefined) {
+		$("input").prop('disabled', true);
+	}
+
 	let serverExists = false;
 	for (let key in displayedServers) {
 		let server = displayedServers[key];
@@ -259,7 +267,6 @@ ipcRenderer.on('messageReceived', function (event, address, message) {
 		appendMessage(address, message);
 
 	} else if (message.event === true) {
-		console.log(message);
 		//This message is an event
 		appendEvent(address, message);
 
