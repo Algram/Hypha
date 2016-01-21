@@ -63,7 +63,6 @@ $('#channelList').on('click', 'channel', function (e) {
 	e.preventDefault();
 
 	//Enable input-fields
-
 	$("input").prop('disabled', false);
 
 	let serverAddress = $(this).siblings('name').text();
@@ -95,7 +94,11 @@ ipcRenderer.on('channelSelected_reply', function (event, address, channel, usern
 	util.updateScrollState();
 });
 
+/*
+Gets triggered when the userlist changes. Fill usermenu accordingly.
+ */
 ipcRenderer.on('userlistChanged', function (event, address, channel) {
+	//Only call when channel is currently selected to prevent duplicate entries
 	if (selectedServer === address && selectedChannel.name === channel.name) {
 		selectedChannel.users = channel.users;
 		util.fillUsermenu(channel.users);
@@ -163,6 +166,10 @@ $('#addChannel').click(function(e) {
 // Receiving Events //
 //////////////////////
 
+/*
+Gets triggerred when information about a channel arrives. Adds server/channel
+to the interface in alphabetical order
+ */
 ipcRenderer.on('channelData', function (event, address, channel) {
 	if (selectedChannel === undefined) {
 		$("input").prop('disabled', true);
@@ -240,6 +247,10 @@ ipcRenderer.on('channelData', function (event, address, channel) {
 	}
 });
 
+/*
+A message was received. Check what kind of message it is and act accordingly.
+Also check for username mentions, links and encoding.
+ */
 ipcRenderer.on('messageReceived', function (event, address, message) {
 	if (message.event === false && message.action === false) {
 		//Mark as unread if not in selectedChannel
