@@ -8,7 +8,6 @@ class Client {
 	constructor(nick, address, options) {
 		this.nick = nick;
 		this.address = address;
-		this.options = options;
 		this.channels = [];
 		this.selectedChannel = '';
 

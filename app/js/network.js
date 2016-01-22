@@ -9,6 +9,12 @@ class Network {
 		this.clients = [];
 	}
 
+	/**
+	 * Adds a new client to the network and initializes it
+	 * @param {string} nick    Nickname for the client
+	 * @param {string} address Address of the client
+	 * @param {object} options Options for the client
+	 */
 	addClient(nick, address, options) {
 		for (let key in this.clients) {
 			let client = this.clients[key];
@@ -30,6 +36,11 @@ class Network {
 		}
 	}
 
+	/**
+	 * Get a client by its address
+	 * @param  {string} address Address to be matched
+	 * @return {client}         Matched client
+	 */
 	getClient(address) {
 		for (let key in this.clients) {
 			let selClient = this.clients[key]
@@ -40,10 +51,18 @@ class Network {
 		}
 	}
 
+	/**
+	 * Gets all clients
+	 * @return {array} Array of clients
+	 */
 	getAllClients() {
 		return this.clients;
 	}
 
+	/**
+	 * Adds listeners for the client by passing a reference to it
+	 * @param {client} client Client to add listeners for
+	 */
 	addListeners(client) {
 		client.on('channelData', (address, channel) => {
 			this.emit('channelData', address, channel);

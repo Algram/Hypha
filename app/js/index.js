@@ -63,7 +63,7 @@ $('#channelList').on('click', 'channel', function (e) {
 	e.preventDefault();
 
 	//Enable input-fields
-	$("input").prop('disabled', false);
+	$('input').prop('disabled', false);
 
 	let serverAddress = $(this).siblings('name').text();
 
