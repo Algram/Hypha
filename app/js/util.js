@@ -28,7 +28,12 @@ function autocomplete(str, users, callback) {
  */
 function fillUsermenu(usersArr) {
 	$('usermenu users').empty();
-	let sortedUsers = usersArr.sort();
+
+	let sortedUsers = usersArr.sort(function(a, b) {
+	    return (a.name > b.name) - (a.name < b.name);
+	});
+
+	console.log(sortedUsers);
 
 	for (let key in sortedUsers) {
 		let user = sortedUsers[key];
@@ -88,17 +93,18 @@ function encodeEntities(value) {
  */
 function stringToColour(str) {
 	let colorsExtrapol = [];
+
 	let colors = [
-		'#b58900','#af8700','#cb4b16','#d75f00',
-		'#d33682','#af005f','#6c71c4','#5f5faf',
-		'#268bd2','#0087ff','#2aa198','#00afaf',
-		'#859900','#5f8700'
+		'#859900','#cb4b16',
+		'#2aa198','#dc322f',
+		'#268bd2','#6c71c4',
+		'#d33682','#b58900'
 	]
 
 	for (let i = 0; i < colors.length; i++) {
 		let hsvColor = please.HEX_to_HSV(colors[i]);
 		let scheme = please.make_scheme(hsvColor, {
-			scheme_type: 'split-complementary',
+			scheme_type: 'analogous',
 			format: 'hex'
 		})
 
