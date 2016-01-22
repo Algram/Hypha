@@ -10,20 +10,24 @@ class Network {
 	}
 
 	addClient(nick, address, options) {
-		//CLEANUP check for multiple adding of same client
+		for (let key in this.clients) {
+			let client = this.clients[key];
 
-		let defaultOptions = {
-			autoConnect: false,
-			realName: 'irclean_wip',
-			debug: true,
-			autoRejoin: true
+			if (client.address !== address) {
+				let defaultOptions = {
+					autoConnect: false,
+					realName: 'irclean_wip',
+					debug: true,
+					autoRejoin: true
+				}
+
+				let cleanOptions = Object.assign({}, defaultOptions, options);
+				let client = new irc.Client(nick, address, cleanOptions);
+				this.clients.push(client);
+
+				this.addListeners(client);
+			}
 		}
-
-		let cleanOptions = Object.assign({}, defaultOptions, options);
-		let client = new irc.Client(nick, address, cleanOptions);
-		this.clients.push(client);
-
-		this.addListeners(client);
 	}
 
 	getClient(address) {
