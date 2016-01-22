@@ -11,7 +11,6 @@ const storage = require('./app/js/storage');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
-let appIcon = null;
 
 //Create the main network for the client
 let network = new irc.Network('testnetwork');
@@ -31,30 +30,6 @@ app.on('ready', function () {
 	// Initial createWindow
 	createWindow();
 	restoreState();
-
-	// Create a tray icon, GPL mock icon from http://www.iconarchive.com/show/captiva-icons-by-bokehlicia/chat-irc-icon.html
-	appIcon = new Tray('app/images/logo.png');
-	appIcon.setToolTip('IRClean');
-	let contextMenu = Menu.buildFromTemplate([{
-		label: 'Quit',
-		click: function () {
-			app.quit();
-		}
-	}]);
-	appIcon.setContextMenu(contextMenu);
-
-	// Show and hide the application
-	appIcon.on('click', function () {
-
-		if (mainWindow !== null && mainWindow.isVisible()) {
-			mainWindow.hide();
-		} else if (mainWindow !== null && mainWindow.isVisible() === 0) {
-			mainWindow.show();
-		}
-		if (mainWindow === null) {
-			createWindow();
-		}
-	});
 
 	//mainWindow.setMenu(null);
 
