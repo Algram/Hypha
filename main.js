@@ -111,6 +111,10 @@ app.on('ready', function () {
 		network.getClient(address).changeNick(nick);
 	});
 
+	ipcMain.on('closeWindow', function (event) {
+		mainWindow.close();
+	});
+
 	// Open the DevTools.
 	mainWindow.webContents.openDevTools();
 
@@ -152,10 +156,6 @@ app.on('ready', function () {
 		storage.set('lastConnectionState', {
 			clients: clients
 		});
-	});
-
-	ipcMain.on('closeWindow', function (event) {
-		mainWindow.close();
 	});
 
 	// Emitted when the window is closed.

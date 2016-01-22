@@ -27,6 +27,16 @@ class Channel {
 		return (this);
 	}
 
+	getUser(name) {
+		for (let key in this.users) {
+			let user = this.users[key];
+
+			if (user.name === name) {
+				return user;
+			}
+		}
+	}
+
 	getUsers() {
 		return this.users;
 	}

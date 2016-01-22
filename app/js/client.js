@@ -273,8 +273,9 @@ class Client {
 				//Only execute once to prevent multiple message-events
 				if (!changedUser) {
 					changedUser = true;
-					channel.removeUser(oldNick);
-					channel.addUser({name: newNick, rank: ''});
+					let userToRemove = channel.getUser(oldNick);
+					channel.removeUser(userToRemove.name);
+					channel.addUser({name: newNick, rank: userToRemove.rank});
 				}
 
 				for (let key in users) {
