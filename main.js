@@ -13,7 +13,7 @@ const storage = require('./app/js/storage');
 let mainWindow;
 
 //Create the main network for the client
-let network = new irc.Network('testnetwork');
+let network = new irc.Network('default');
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

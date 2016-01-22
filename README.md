@@ -1,4 +1,4 @@
-# irclean_wip
+# Hypha
 
 Work in Progress IRC-Client based on electron combined with HTML5 and CSS3.
 

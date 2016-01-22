@@ -18,7 +18,7 @@ class Network {
 	addClient(nick, address, options) {
 		let defaultOptions = {
 			autoConnect: false,
-			realName: 'irclean_wip',
+			realName: 'Hypha IRC',
 			debug: true,
 			autoRejoin: true
 		}
