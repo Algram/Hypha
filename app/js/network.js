@@ -16,24 +16,18 @@ class Network {
 	 * @param {object} options Options for the client
 	 */
 	addClient(nick, address, options) {
-		for (let key in this.clients) {
-			let client = this.clients[key];
-
-			if (client.address !== address) {
-				let defaultOptions = {
-					autoConnect: false,
-					realName: 'irclean_wip',
-					debug: true,
-					autoRejoin: true
-				}
-
-				let cleanOptions = Object.assign({}, defaultOptions, options);
-				let client = new irc.Client(nick, address, cleanOptions);
-				this.clients.push(client);
-
-				this.addListeners(client);
-			}
+		let defaultOptions = {
+			autoConnect: false,
+			realName: 'irclean_wip',
+			debug: true,
+			autoRejoin: true
 		}
+
+		let cleanOptions = Object.assign({}, defaultOptions, options);
+		let client = new irc.Client(nick, address, cleanOptions);
+		this.clients.push(client);
+
+		this.addListeners(client);
 	}
 
 	/**
