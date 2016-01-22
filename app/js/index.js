@@ -105,8 +105,8 @@ ipcRenderer.on('userlistChanged', function (event, address, channel) {
 	}
 });
 
-ipcRenderer.on('pmReceived', function (address, nick, text) {
-
+ipcRenderer.on('pmReceived', function (event, address, nick, text) {
+	console.log(address, nick, text);
 });
 
 $('#titlebar').on('click', 'add',function (e) {
@@ -499,7 +499,7 @@ $('#titlebar').on('click', 'close', function (e) {
 /**
  * Add tooltip for overflow elements
  */
-$(document).on('mouseover', 'nick', function () {
+$(document).on('mouseover', 'nick, user', function () {
     var $this = $(this);
 
     if(this.offsetWidth < this.scrollWidth && !$this.attr('title')){

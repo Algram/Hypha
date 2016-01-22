@@ -94,6 +94,9 @@ a:hover {
 
 #titlebar user {
     display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     color: rgb(180, 180, 180)
 }
 

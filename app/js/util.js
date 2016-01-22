@@ -33,11 +33,16 @@ function fillUsermenu(usersArr) {
 	    return (a.name > b.name) - (a.name < b.name);
 	});
 
-	console.log(sortedUsers);
-
 	for (let key in sortedUsers) {
 		let user = sortedUsers[key];
-		$('usermenu users').append('<user>' + user.name + '</user>');
+
+		if (user.rank === '') {
+			$('usermenu users').append('<user>' + user.name + '</user>');
+		} else if (user.rank === '+') {
+			$('usermenu users').append('<user><i class="fa fa-user-plus"></i>' + user.name + '</user>');
+		} else if (user.rank === '@') {
+			$('usermenu users').append('<user><i class="fa fa-user-md"></i>' + user.name + '</user>');
+		}
 	}
 
 	$('usermenu').attr('data-before', usersArr.length);

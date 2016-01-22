@@ -295,11 +295,11 @@ class Client {
 			}
 		});
 
-		this.client.addListener('notice', function (nick, to, text, message) {
+		this.client.addListener('notice', (nick, to, text, message) => {
 			//console.log('NOTICE: ', nick, to, text, message);
 		});
 
-		this.client.addListener('pm', function (nick, text, message) {
+		this.client.addListener('pm', (nick, text, message) => {
 			console.log('PRIVATEM: ', nick, text, message);
 			this.emit('pmReceived', this.address, nick, text);
 		});
