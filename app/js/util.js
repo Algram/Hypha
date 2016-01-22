@@ -2,8 +2,12 @@
 const path = require('path');
 const shell = require('shell');
 
-/*
-TODO add returning of multiple names, not just the first match
+/**
+ * Autocompletes a list of users and returns the next matched user.
+ * @param  {string}   str      String that is used for autocompletion
+ * @param  {array}   users     List of users
+ * @param  {function} callback callback
+ * @return {string}            Username that was matched
  */
 function autocomplete(str, users, callback) {
 	for (let key in users) {
@@ -17,7 +21,11 @@ function autocomplete(str, users, callback) {
 	}
 }
 
-//TODO add rank
+/**
+ * Fills the usermenu with the entries from the given array.
+ * @param  {array} usersArr Array of users
+ * @return {void}           void
+ */
 function fillUsermenu(usersArr) {
 	$('usermenu users').empty();
 	let sortedUsers = usersArr.sort();
@@ -32,7 +40,10 @@ function fillUsermenu(usersArr) {
 
 /**
  * Use native notification-system libnotify. Works on most Mac and
- * most Linux-Systems, no support for windows
+ * Linux systems, no support for windows.
+ * @param  {string} title Title to display
+ * @param  {string} body  Body to display
+ * @return {void}       void
  */
 function doNotify(title, body) {
 	let options = {
@@ -70,6 +81,11 @@ function encodeEntities(value) {
 	replace(/>/g, '&gt;');
 }
 
+/**
+ * Takes a string and returns a matching color for that specific string.
+ * @param  {string} str String to match against
+ * @return {string}     Hex-color code
+ */
 function stringToColour(str) {
 	let colorsExtrapol = [];
 	let colors = [
@@ -95,8 +111,9 @@ function stringToColour(str) {
 	return colorsExtrapol[number];
 }
 
-/*
-Updates the scroll state to the last appended line
+/**
+ * Sets the scrollState of the messageArea to the last appended line.
+ * @return {void} void
  */
 function updateScrollState() {
 	//Scroll to last appended message
@@ -105,8 +122,10 @@ function updateScrollState() {
 	}, 0);
 }
 
-/*
-This uses a permissive regex to find urls in a string
+/**
+ * Regex that matches urls in a string in a permissive way.
+ * @param  {string} str String to match against
+ * @return {boolean}     If the string contains urls
  */
 function findLinks(str) {
 	let pattern = /\b(?:[a-z]{2,}?:\/\/)?([^\s./]+\.)+[^\d\s./:?]\w+(?::\d{1,5})?(?:\/[^\s]*\b|\b)(?![:.?#]\S)/gi;
@@ -115,9 +134,12 @@ function findLinks(str) {
 }
 
 /**
- * Returns true if the last nicks up until the last different nick
- * are unique. This is used to remove the nickname when possible, for example
- * when one user sends multiple messages
+ * Checks if the last nick appended is unique until the next nick. This is
+ * used to remove the nickname from the ui when possible, e.g. when one
+ * user sends multiple messages.
+ * @param  {string} nextNick The next nick to be appended
+ * @param  {jquery-object} $channel The dom node where the nicks are at
+ * @return {boolean}          If nick is unique
  */
 function lastNicksUnique(nextNick, $channel) {
 	let unique = true;
@@ -152,6 +174,11 @@ function lastNicksUnique(nextNick, $channel) {
 	return unique;
 }
 
+/**
+ * Opens a given url with the default browser of the systems
+ * @param  {string} string Url to open
+ * @return {void}        void
+ */
 function openLink(string) {
 	//Check if "http://" is there and add it if necessary
 	if (string.match(/^[^/]+:\/\//)) {
