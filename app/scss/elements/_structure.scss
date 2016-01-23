@@ -1,0 +1,297 @@
+ html, body {
+  color: $body-color;
+  display: flex;
+  flex-direction: column;
+  font-size: $body-font-size;
+  margin: 0;
+  padding: 0;
+  width: 100%; height: 100%;
+}
+
+a {
+  color: $link-color;
+}
+a:hover {
+  color: $link-hover-color;
+  cursor: pointer;
+}
+
+#titlebar {
+  background: $dark-gray;
+  display: flex;
+  height: $titlebar-height;
+  justify-content: space-between;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+
+  add, usermenu, close, settings {
+    align-items: center;
+    background: $titlebar-clickable-background;
+    color: $titlebar-clickable-color;
+    display: flex;
+    justify-content: center;
+    width: $titlebar-height; height: $titlebar-height;
+    -webkit-app-region: no-drag;
+
+    &:hover {
+      background: $titlebar-clickable-hover-background;
+    }
+    user {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: $link-color;
+    }
+  }
+}
+add {
+  margin-right: auto;
+}
+usermenu {
+  users {
+    position: absolute;
+    padding: 10px;
+    width: 150px;
+    max-height: 200px;
+    overflow: auto;
+    top: 55px;
+    right: 30px;
+    background: $titlebar-clickable-background;
+    z-index: 1;
+  }
+
+  &::after {
+      content: attr(data-before);
+  }
+  &::before {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+      top: 43px;
+      right: 90px;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 12px solid $titlebar-clickable-background;
+      z-index: 1;
+  }
+
+  &.closed::before {
+      display: none;
+  }
+
+  &.closed users {
+      display: none;
+  }
+}
+close {
+
+}
+
+#wrapper {
+  background: $wrapper-background;
+  display: flex;
+  flex: 1;
+
+  #channelList {
+    border-right: $channellist-border;
+    width: $channellist-width;
+
+    server {
+      border-bottom: $channellist-server-border;
+      display: block;
+      margin: $channellist-server-margin;
+
+      name {
+        border-bottom: $channellist-channel-border;
+        display: block;
+        cursor: default;
+        padding: 0 10px;
+      	color: $channellist-server-color;
+      }
+    }
+
+    channel {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      list-style-type: none;
+      color: $channellist-channel-color;
+      padding: 7px 28px 7px 10px;
+
+      &:hover {
+        cursor: pointer;
+        background: $light-gray;
+      }
+
+      &.selected {
+        background: $light-gray;
+      }
+
+      &.unread {
+        color: $channellist-channel-unread-color;
+      }
+    }
+
+  }
+  #content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    #messageArea {
+      flex: 1;
+      overflow: auto;
+
+      .row {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+
+        .nick {
+          padding: $messagearea-padding;
+          min-width: $messagearea-nick-min-width;
+        }
+        .message {
+          flex: 1;
+          padding: $messagearea-padding;
+        }
+      }
+
+
+      line {
+        display: flex;
+        padding: 2px 0;
+      }
+
+      timestamp {
+        width: 80px;
+        display: block;
+      }
+
+      action {
+        display: block;
+        margin-right: auto;
+        font-style: italic;
+        color: rgb(160, 160, 160);
+      }
+
+      nick {
+        display: block;
+        width: 120px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        flex-grow: 0;
+        flex-shrink: 0;
+      }
+
+      message {
+          display: block;
+
+        &.highlighted {
+          font-weight: bold;
+        }
+      }
+
+      event {
+          display: block;
+          margin-left: auto;
+          color: rgb(160, 160, 160);
+      }
+    }
+    #writeArea {
+      display: flex;
+
+      input {
+        background: $light-gray;
+        border: 0;
+        height: $titlebar-height;
+        padding: $writearea-padding;
+        outline: none;
+
+        &#usernameInput {
+          border-right: $writearea-border;
+          width: $writearea-nick-width;
+        }
+        &#messageInput {
+          flex: 1;
+        }
+      }
+    }
+  }
+}
+
+usermenu ::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+usermenu ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+usermenu ::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 5px;
+  background: rgba(60, 60, 60, .33);
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 5px;
+  background: rgba(140, 140, 140, .33);
+}
+
+.modal {
+  display: none;
+  flex-direction: column;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  font-size: 14px;
+  width: 600px;
+  padding: 10px;
+  background: #1E1E1E;
+  border: 1px solid #0A0A0A;
+  box-shadow: 0 0 0 1000em rgba(0,0,0,.5);
+
+  .row {
+    display: flex;
+    margin: 10px 0;
+  }
+
+  .close {
+    background: #0A0A0A;
+    color: rgb(180, 180, 180);
+  }
+
+  input, button, select {
+    background: #7F7F7F;
+    border: 0;
+    margin: 0 8px;
+    padding: 0 5px;
+    width: 100%; height: 35px;
+  }
+}
+.modal.active {
+  display: flex;
+}
+
+.prevent {
+  pointer-events: none;
+
+  .modal {
+    pointer-events: auto;
+  }
+}
