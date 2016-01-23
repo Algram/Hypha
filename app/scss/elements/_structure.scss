@@ -41,7 +41,7 @@ a:hover {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      color: rgb(180, 180, 180);
+      color: $link-color;
     }
   }
 }
@@ -49,6 +49,18 @@ add {
   margin-right: auto;
 }
 usermenu {
+  users {
+    position: absolute;
+    padding: 10px;
+    width: 150px;
+    max-height: 200px;
+    overflow: auto;
+    top: 55px;
+    right: 30px;
+    background: $titlebar-clickable-background;
+    z-index: 1;
+  }
+
   &::after {
       content: attr(data-before);
   }
@@ -58,10 +70,10 @@ usermenu {
       width: 0;
       height: 0;
       top: 43px;
-      left: 10px;
+      right: 90px;
       border-left: 10px solid transparent;
       border-right: 10px solid transparent;
-      border-bottom: 12px solid rgb(20, 20, 20);
+      border-bottom: 12px solid $titlebar-clickable-background;
       z-index: 1;
   }
 
@@ -71,10 +83,6 @@ usermenu {
 
   &.closed users {
       display: none;
-  }
-
-  &:hover {
-      background: rgb(10, 10, 10);
   }
 }
 close {
