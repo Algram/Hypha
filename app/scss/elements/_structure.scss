@@ -24,7 +24,7 @@ a:hover {
   -webkit-user-select: none;
   -webkit-app-region: drag;
 
-  add, usermenu, close {
+  add, usermenu, close, settings {
     align-items: center;
     background: $titlebar-clickable-background;
     color: $titlebar-clickable-color;
@@ -35,6 +35,13 @@ a:hover {
 
     &:hover {
       background: $titlebar-clickable-hover-background;
+    }
+    user {
+      display: block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: rgb(180, 180, 180);
     }
   }
 }
@@ -97,7 +104,7 @@ close {
       }
     }
 
-    channel{
+    channel {
       display: block;
       overflow: hidden;
       white-space: nowrap;
@@ -117,7 +124,7 @@ close {
 
       &.unread {
         color: $channellist-channel-unread-color;
-      }  
+      }
     }
 
   }
@@ -148,11 +155,19 @@ close {
 
       line {
         display: flex;
+        padding: 2px 0;
       }
 
       timestamp {
         width: 80px;
         display: block;
+      }
+
+      action {
+        display: block;
+        margin-right: auto;
+        font-style: italic;
+        color: rgb(160, 160, 160);
       }
 
       nick {
