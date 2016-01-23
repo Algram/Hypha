@@ -126,42 +126,7 @@ app.on('ready', function () {
 
 	// Emitted when the window is being closed.
 	mainWindow.on('close', function () {
-		//Set lastWindowState
-		let bounds = mainWindow.getBounds();
-		storage.set('lastWindowState', {
-			x: bounds.x,
-			y: bounds.y,
-			width: bounds.width,
-			height: bounds.height,
-			maximized: mainWindow.isMaximized()
-		});
-
-		//Set lastConnectionState
-		let clients = [];
-		let currClients = network.getAllClients();
-
-		for (let key in currClients) {
-			let currClient = currClients[key];
-			let client = {};
-			let nick = currClient.nick;
-			let address = currClient.address;
-			let channels = [];
-
-			for (let key in currClient.channels) {
-				let currChannel = currClient.channels[key];
-
-				channels.push(currChannel.name);
-			}
-
-			client.nick = nick;
-			client.address = address;
-			client.channels = channels;
-			clients.push(client);
-		}
-
-		storage.set('lastConnectionState', {
-			clients: clients
-		});
+		saveState();
 	});
 
 	// Emitted when the window is closed.
@@ -170,6 +135,14 @@ app.on('ready', function () {
 		// in an array if your app supports multi windows, this is the time
 		// when you should delete the corresponding element.
 		mainWindow = null;
+	});
+
+	require('electron').powerMonitor.on('suspend', function() {
+	  saveState();
+	});
+
+	require('electron').powerMonitor.on('resume', function() {
+	  restoreState();
 	});
 });
 
@@ -198,6 +171,45 @@ function createWindow() {
 	if (lastWindowState.maximized) {
 		mainWindow.maximize();
 	}
+}
+
+function saveState() {
+	//Set lastWindowState
+	let bounds = mainWindow.getBounds();
+	storage.set('lastWindowState', {
+		x: bounds.x,
+		y: bounds.y,
+		width: bounds.width,
+		height: bounds.height,
+		maximized: mainWindow.isMaximized()
+	});
+
+	//Set lastConnectionState
+	let clients = [];
+	let currClients = network.getAllClients();
+
+	for (let key in currClients) {
+		let currClient = currClients[key];
+		let client = {};
+		let nick = currClient.nick;
+		let address = currClient.address;
+		let channels = [];
+
+		for (let key in currClient.channels) {
+			let currChannel = currClient.channels[key];
+
+			channels.push(currChannel.name);
+		}
+
+		client.nick = nick;
+		client.address = address;
+		client.channels = channels;
+		clients.push(client);
+	}
+
+	storage.set('lastConnectionState', {
+		clients: clients
+	});
 }
 
 function restoreState() {

@@ -9,7 +9,6 @@ class Client {
 		this.nick = nick;
 		this.address = address;
 		this.channels = [];
-		this.connected = false;
 		this.selectedChannel = '';
 
 		this.client = new irc.Client(address, nick, options);
@@ -33,11 +32,6 @@ class Client {
 
 			// Add it to the collection.
 			this.channels.push(ircchannel);
-
-			if (!this.connected) {
-				this.connect();
-			}
-			
 			this.join(name);
 		}
 
@@ -109,8 +103,6 @@ class Client {
 		let channels = this.channels;
 
 		client.connect(function () {
-			this.connected = true;
-
 			for (let key in channels) {
 				let channel = channels[key];
 				client.join(channel.getName());
@@ -119,8 +111,8 @@ class Client {
 	}
 
 	disconnect(message) {
+		console.log('beepdiscon');
 		this.client.disconnect(message, function(e) {
-			this.connected = false;
 			console.log('OUTBIY', e);
 		});
 	}
@@ -257,7 +249,6 @@ class Client {
 		});
 
 		this.client.addListener('action', (from, to, text, messageObj) => {
-			console.log('BEEP');
 			let message = {
 				from: from,
 				to: to,
