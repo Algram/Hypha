@@ -112,7 +112,13 @@ app.on('ready', function () {
 	});
 
 	ipcMain.on('closeWindow', function (event) {
-		mainWindow.close();
+		let cls = network.getAllClients();
+		for (let key in cls) {
+			let cl = cls[key];
+			cl.disconnect('Connection closed');
+		}
+
+		mainWindow.close()
 	});
 
 	// Open the DevTools.
@@ -203,11 +209,15 @@ function restoreState() {
 		for (let key in lastClients) {
 			let lastClient = lastClients[key];
 			network.addClient(lastClient.nick, lastClient.address);
-			network.getClient(lastClient.address).connect();
 
-			for (let key in lastClient.channels) {
-				let newChannel = lastClient.channels[key];
-				network.getClient(lastClient.address).addChannel(newChannel);
+			//Only connect if server has channels
+			if (lastClient.channels.length !== 0) {
+				network.getClient(lastClient.address).connect();
+
+				for (let key in lastClient.channels) {
+					let newChannel = lastClient.channels[key];
+					network.getClient(lastClient.address).addChannel(newChannel);
+				}
 			}
 		}
 	}
