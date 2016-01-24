@@ -11,6 +11,128 @@ let selectedServer = '';
 let selectedChannel;
 let selectedUsername;
 
+
+ipcRenderer.on('pmReceived', function (event, address, nick, text) {
+	ipcRenderer.send('channelAdded', address, nick);
+	console.log(address, nick, text);
+	let channel = {
+		name: nick,
+		users: [selectedUsername, nick],
+		messages: []
+	}
+
+	let serverExists = false;
+	for (let key in displayedServers) {
+		let server = displayedServers[key];
+
+		if (server.address == address) {
+			//Server exists, check if channel does in server
+			serverExists = true;
+
+			if (server.channels.indexOf(channel.name) == -1) {
+				//Channel doesnt exist, add it to the server
+				server.channels.push(channel.name);
+
+				let line = '<channel>' + channel.name + '</channel>';
+				let selServerCL = $('server name:contains(' + address + ')').parent();
+
+				let toinsert = true;
+				selServerCL.children('channel').each(function() {
+					let item = $(this).text();
+					if(channel.name.toUpperCase() < item.toUpperCase()){
+						if(toinsert){
+							$(this).before(line);
+							toinsert = false;
+						}
+					}
+				});
+
+				if(toinsert){
+					selServerCL.append(line);
+				}
+
+				//Add channel-tag to messageArea, refactor to also add server-tag
+				let selServer = $('[name="' + address + '"]');
+				let msgLine = '<channel name="' + channel.name + '"></channel>';
+				selServer.append(msgLine);
+			}
+		}
+	}
+
+	//Server doesn't exist, add it
+	if (!serverExists) {
+		let serverData = {
+			address: address,
+			channels: [channel.name]
+		}
+
+		displayedServers.push(serverData);
+
+		let line = '<server><name>' + address + '</name><channel>' +
+			channel.name + '</channel></server>';
+
+		let toinsert = true;
+		$('#channelList').children('server').each(function() {
+			let item = $(this).children('name').text();
+			if(address.toUpperCase() < item.toUpperCase()){
+				if(toinsert){
+					$(this).before(line);
+					toinsert = false;
+				}
+			}
+		});
+
+		if(toinsert){
+			$('#channelList').append(line);
+		}
+
+		//Add channel-tag to messageArea, refactor to also add server-tag
+		let msgLine = '<server name="' + address + '"><channel name="' +
+			channel.name + '"></channel></server>';
+		$('#messageArea').append(msgLine);
+	}
+
+	let message = {
+		from: nick,
+		to: nick,
+		message: text
+	}
+
+	//Mark as unread if not in selectedChannel
+	if (address !== selectedServer || message.to !== selectedChannel.name) {
+		let affectedServer = $('server name:contains(' + address + ')').parent();
+		let affectedChannel = affectedServer.children('channel').filter(function () {
+			return ($(this).text() === message.to)
+		});
+
+		$(affectedChannel).addClass('unread');
+	}
+
+	//Need to handle when channel is not clicked yet, edge case
+	if (selectedChannel !== undefined) {
+		//Make messages of now selectedChannel visible, hide all others
+		//TODO code-duplication
+		$("#messageArea server").children('channel').css('display', 'none');
+		let selServer = $('[name="' + selectedServer + '"]');
+		let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
+		selChannel.css('display', 'block');
+	} else {
+		$("#messageArea server").children('channel').css('display', 'none');
+	}
+
+
+	appendMessage(address, message);
+
+});
+
+
+
+
+
+
+
+
+
 initializeMenus();
 function initializeMenus() {
 	//TEXT EDIT MENU
@@ -111,10 +233,6 @@ ipcRenderer.on('usernameChanged', function (event, address, nick) {
 		//Set new username und fill usermenu
 		$('#usernameInput').attr('placeholder', nick);
 	}
-});
-
-ipcRenderer.on('pmReceived', function (event, address, nick, text) {
-	console.log(address, nick, text);
 });
 
 $('#titlebar').on('click', 'add',function (e) {

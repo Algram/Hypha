@@ -20,11 +20,7 @@ class Network {
 			autoConnect: false,
 			realName: 'Hypha IRC',
 			debug: true,
-			autoRejoin: true/*,
-			sasl: true,
-			nick: 'Algram',
-			userName: 'Algram',
-			password: 'gU82fGp43Tb'*/
+			autoRejoin: true
 		}
 
 		let cleanOptions = Object.assign({}, defaultOptions, options);
