@@ -10,135 +10,9 @@ let displayedServers = [];
 let selectedServer = '';
 let selectedChannel;
 let selectedUsername;
-
-function addChannelItem(address, channel) {
-	let serverExists = false;
-	for (let key in displayedServers) {
-		let server = displayedServers[key];
-
-		if (server.address == address) {
-			//Server exists, check if channel does in server
-			serverExists = true;
-			console.log('server exists');
-
-			if (server.channels.indexOf(channel.name) == -1) {
-				//Channel doesnt exist, add it to the server
-				server.channels.push(channel.name);
-
-				let line = '<channel>' + channel.name + '</channel>';
-				let selServerCL = $('server name:contains(' + address + ')').parent();
-
-				let toinsert = true;
-				selServerCL.children('channel').each(function() {
-					let item = $(this).text();
-					if(channel.name.toUpperCase() < item.toUpperCase()){
-						if(toinsert){
-							$(this).before(line);
-							toinsert = false;
-						}
-					}
-				});
-
-				if(toinsert){
-					selServerCL.append(line);
-				}
-
-				//Add server and channel to messageArea
-				let selServer = $('[name="' + address + '"]');
-				let msgLine = '<channel name="' + channel.name + '"></channel>';
-				selServer.append(msgLine);
-			}
-		}
-	}
-
-	//Server doesn't exist, add it
-	if (!serverExists) {
-		console.log('server new')
-		let serverData = {
-			address: address,
-			channels: [channel.name]
-		}
-
-		displayedServers.push(serverData);
-
-		let line = '<server><name>' + address + '</name><channel>' +
-			channel.name + '</channel></server>';
-
-		let toinsert = true;
-		$('#channelList').children('server').each(function() {
-			let item = $(this).children('name').text();
-			if(address.toUpperCase() < item.toUpperCase()){
-				if(toinsert){
-					$(this).before(line);
-					toinsert = false;
-				}
-			}
-		});
-
-		if(toinsert){
-			$('#channelList').append(line);
-		}
-
-		//Add server and channel to messageArea
-		let msgLine = '<server name="' + address + '"><channel name="' +
-			channel.name + '"></channel></server>';
-		$('#messageArea').append(msgLine);
-	}
-
-}
-
-function removeChannelItem(address, channelName) {
-	//REMOVE FROM SIDEBAR
-	let sidebarServer = $('server name:contains(' + address + ')').parent();
-	let sidebarChannel = sidebarServer.children('channel').filter(function () {
-		return ($(this).text() === channelName)
-	});
-
-	sidebarChannel.remove();
-
-	if (sidebarServer.children('channel').length === 0) {
-		sidebarServer.remove();
-	}
-
-	//REMOVE FROM MESSAGEAREA
-	let msgareaServer = $('[name="' + address + '"]');
-	let msgareaChannel = msgareaServer.children('[name="' + channelName + '"]');
-
-	msgareaChannel.remove();
-
-	if (msgareaServer.children('channel').length === 0) {
-		msgareaServer.remove();
-	}
-
-	//REMOVE FROM INTERNALDATA
-	for (let key in displayedServers) {
-		let serverIndex = key;
-		let server = displayedServers[key];
-		console.log('1');
-		if (server.address === address) {
-			console.log('2');
-			for (let key in server.channels) {
-				let channel = server.channels[key];
-
-				console.log(channel.name, channelName);
-				if (channel === channelName) {
-					console.log('3');
-					server.channels.splice(key, 1);
-
-					if (server.channels.length === 0) {
-						console.log('4');
-						displayedServers.splice(serverIndex, 1);
-					}
-				}
-			}
-		}
-	}
-}
+initializeMenus();
 
 ipcRenderer.on('pmReceived', function (event, address, nick, text) {
-	//Why do we call this here?
-	ipcRenderer.send('channelAdded', address, nick);
-
 	let channel = {
 		name: nick,
 		users: [selectedUsername, nick],
@@ -146,6 +20,7 @@ ipcRenderer.on('pmReceived', function (event, address, nick, text) {
 	}
 
 	addChannelItem(address, channel);
+	ipcRenderer.send('channelAdded', address, nick);
 
 	let message = {
 		from: nick,
@@ -175,52 +50,8 @@ ipcRenderer.on('pmReceived', function (event, address, nick, text) {
 		$("#messageArea server").children('channel').css('display', 'none');
 	}
 
-
 	appendMessage(address, message);
-
 });
-
-
-
-
-
-
-
-
-
-initializeMenus();
-function initializeMenus() {
-	//TEXT EDIT MENU
-	let textMenu = Menu.buildFromTemplate([{
-	        label: 'Copy',
-	        role: 'copy',
-	    }
-	]);
-
-	$('#messageArea').on('contextmenu', 'line', function (e) {
-		e.preventDefault();
-		textMenu.popup(remote.getCurrentWindow());
-	})
-
-
-	//CHANNEL REMOVE MENU
-	let channelMenu = new Menu();
-	let elementTargeted;
-	channelMenu.append(new MenuItem({ label: 'Remove', click: function() {
-		let serverAddress = elementTargeted.siblings('name').text();
-		let channelName = elementTargeted.text();
-
-		removeChannelItem(serverAddress, channelName);
-
-		ipcRenderer.send('channelRemoved', serverAddress, channelName);
-	}}));
-
-	$('#channelList').on('contextmenu', 'channel', function (e) {
-		e.preventDefault();
-		elementTargeted = $(this);
-		channelMenu.popup(remote.getCurrentWindow());
-	})
-}
 
 /*
 New channel was selected, tell main and trigger visual changes
@@ -604,6 +435,167 @@ $('#titlebar').on('click', 'close', function (e) {
 	e.preventDefault();
 	ipcRenderer.send('closeWindow');
 })
+
+function addChannelItem(address, channel) {
+	let serverExists = false;
+	for (let key in displayedServers) {
+		let server = displayedServers[key];
+
+		if (server.address == address) {
+			//Server exists, check if channel does in server
+			serverExists = true;
+			console.log('server exists');
+
+			if (server.channels.indexOf(channel.name) == -1) {
+				//Channel doesnt exist, add it to the server
+				server.channels.push(channel.name);
+
+				let line = '<channel>' + channel.name + '</channel>';
+				let selServerCL = $('server name:contains(' + address + ')').parent();
+
+				let toinsert = true;
+				selServerCL.children('channel').each(function() {
+					let item = $(this).text();
+					if(channel.name.toUpperCase() < item.toUpperCase()){
+						if(toinsert){
+							$(this).before(line);
+							toinsert = false;
+						}
+					}
+				});
+
+				if(toinsert){
+					selServerCL.append(line);
+				}
+
+				//Add server and channel to messageArea
+				let selServer = $('[name="' + address + '"]');
+				let msgLine = '<channel name="' + channel.name + '"></channel>';
+				selServer.append(msgLine);
+			}
+		}
+	}
+
+	//Server doesn't exist, add it
+	if (!serverExists) {
+		console.log('server new')
+		let serverData = {
+			address: address,
+			channels: [channel.name]
+		}
+
+		displayedServers.push(serverData);
+
+		let line = '<server><name>' + address + '</name><channel>' +
+			channel.name + '</channel></server>';
+
+		let toinsert = true;
+		$('#channelList').children('server').each(function() {
+			let item = $(this).children('name').text();
+			if(address.toUpperCase() < item.toUpperCase()){
+				if(toinsert){
+					$(this).before(line);
+					toinsert = false;
+				}
+			}
+		});
+
+		if(toinsert){
+			$('#channelList').append(line);
+		}
+
+		//Add server and channel to messageArea
+		let msgLine = '<server name="' + address + '"><channel name="' +
+			channel.name + '"></channel></server>';
+		$('#messageArea').append(msgLine);
+	}
+
+}
+
+function removeChannelItem(address, channelName) {
+	//REMOVE FROM SIDEBAR
+	let sidebarServer = $('server name:contains(' + address + ')').parent();
+	let sidebarChannel = sidebarServer.children('channel').filter(function () {
+		return ($(this).text() === channelName)
+	});
+
+	sidebarChannel.remove();
+
+	if (sidebarServer.children('channel').length === 0) {
+		sidebarServer.remove();
+	}
+
+	//REMOVE FROM MESSAGEAREA
+	let msgareaServer = $('[name="' + address + '"]');
+	let msgareaChannel = msgareaServer.children('[name="' + channelName + '"]');
+
+	msgareaChannel.remove();
+
+	if (msgareaServer.children('channel').length === 0) {
+		msgareaServer.remove();
+	}
+
+	//REMOVE FROM INTERNALDATA
+	if (selectedServer === address) {
+		selectedServer = '';
+	}
+
+	if (selectedChannel.name === channelName) {
+		selectedChannel = undefined;
+	}
+
+	for (let key in displayedServers) {
+		let serverIndex = key;
+		let server = displayedServers[key];
+
+		if (server.address === address) {
+			for (let key in server.channels) {
+				let channel = server.channels[key];
+
+				if (channel === channelName) {
+					server.channels.splice(key, 1);
+
+					if (server.channels.length === 0) {
+						displayedServers.splice(serverIndex, 1);
+					}
+				}
+			}
+		}
+	}
+}
+
+function initializeMenus() {
+	//TEXT EDIT MENU
+	let textMenu = Menu.buildFromTemplate([{
+	        label: 'Copy',
+	        role: 'copy',
+	    }
+	]);
+
+	$('#messageArea').on('contextmenu', 'line', function (e) {
+		e.preventDefault();
+		textMenu.popup(remote.getCurrentWindow());
+	})
+
+
+	//CHANNEL REMOVE MENU
+	let channelMenu = new Menu();
+	let elementTargeted;
+	channelMenu.append(new MenuItem({ label: 'Remove', click: function() {
+		let serverAddress = elementTargeted.siblings('name').text();
+		let channelName = elementTargeted.text();
+
+		removeChannelItem(serverAddress, channelName);
+
+		ipcRenderer.send('channelRemoved', serverAddress, channelName);
+	}}));
+
+	$('#channelList').on('contextmenu', 'channel', function (e) {
+		e.preventDefault();
+		elementTargeted = $(this);
+		channelMenu.popup(remote.getCurrentWindow());
+	})
+}
 
 /**
  * Add tooltip for overflow elements
