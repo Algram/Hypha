@@ -385,26 +385,36 @@ Enter was pressed, new message needs to be sent to main process
 $("#messageInput").keydown(function (e) {
 	if (e.keyCode == 13) {
 		let messageContent = $(this).val();
+		$(this).val('');
 
 		if (messageContent !== '') {
 			if (messageContent[0] === '/') {
 				//This is a command, parse it and send it
-				$(this).val('');
-
 				let command = messageContent.substring(1).split(' ', 1)[0].toUpperCase();
 				let args = messageContent.substring(command.length + 2);
 
-				if (command === 'ME') {
-					ipcRenderer.send('actionSent', selectedServer,
-						selectedChannel.name, args);
+				switch (command) {
+				    case 'ME':
+						ipcRenderer.send('actionSent', selectedServer,
+							selectedChannel.name, args);
 
-					let message = {
-						from: selectedUsername,
-						to: selectedChannel.name,
-						message: args,
-					}
+						let message = {
+							from: selectedUsername,
+							to: selectedChannel.name,
+							message: args,
+						}
 
-					appendAction(selectedServer, message);
+						appendAction(selectedServer, message);
+				        break;
+
+				    case 'CLEAR':
+						let selServer = $('[name="' + selectedServer + '"]');
+						let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
+						selChannel.empty();
+				        break;
+
+				    default:
+				        console.log('Unknown command');
 				}
 
 			} else {
@@ -413,8 +423,6 @@ $("#messageInput").keydown(function (e) {
 					to: selectedChannel.name,
 					message: messageContent
 				}
-
-				$(this).val('');
 
 				appendMessage(selectedServer, message);
 				ipcRenderer.send('messageSent', selectedServer, message.message);
