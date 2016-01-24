@@ -83,7 +83,6 @@ class Client {
 
 	changeNick(newNick) {
 		this.client.send('NICK', newNick);
-		this.nick = newNick;
 	}
 
 	getNick(name) {
@@ -296,6 +295,12 @@ class Client {
 						}
 
 						this.emit('messageReceived', this.address, message);
+
+						//Emit when username was updated due to errors
+						if (this.nick === oldNick) {
+							this.nick = newNick;
+							this.emit('usernameChanged', this.address, newNick);
+						}
 					}
 				}
 			}

@@ -52,6 +52,10 @@ app.on('ready', function () {
 		mainWindow.webContents.send('userlistChanged', address, channel);
 	})
 
+	network.on('usernameChanged', function (address, nick) {
+		mainWindow.webContents.send('usernameChanged', address, nick);
+	})
+
 	//////////////////////
 	// Receiving Events //
 	//////////////////////

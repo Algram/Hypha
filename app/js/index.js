@@ -105,6 +105,14 @@ ipcRenderer.on('userlistChanged', function (event, address, channel) {
 	}
 });
 
+ipcRenderer.on('usernameChanged', function (event, address, nick) {
+	//Only call when server is currently selected to prevent duplicate entries
+	if (selectedServer === address) {
+		//Set new username und fill usermenu
+		$('#usernameInput').attr('placeholder', nick);
+	}
+});
+
 ipcRenderer.on('pmReceived', function (event, address, nick, text) {
 	console.log(address, nick, text);
 });
