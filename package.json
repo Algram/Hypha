@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "irc": "~0.4.0",
-    "randomcolor": "~0.4.3"
+    "spellchecker": "~3.2.0"
   }
 }
