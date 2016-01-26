@@ -11,6 +11,7 @@ let selectedServer = '';
 let selectedChannel;
 let selectedUsername;
 initializeMenus();
+util.activateSpellChecking();
 
 ipcRenderer.on('pmReceived', function (event, address, nick, text) {
 	let channel = {

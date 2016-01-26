@@ -1,6 +1,21 @@
 'use strict';
 const path = require('path');
 const shell = require('shell');
+const webFrame = require('electron').webFrame;
+
+/**
+ * Activates spell checking for every text input that is in the application
+ * At the moment the default language is en-US, this will eventually be
+ * determined by the language selected in the settings
+ * @return {void} void
+ */
+function activateSpellChecking() {
+	webFrame.setSpellCheckProvider("en-US", true, {
+		spellCheck: function(text) {
+			return !(require('spellchecker').isMisspelled(text));
+		}
+	});
+}
 
 /**
  * Autocompletes a list of users and returns the next matched user.
@@ -204,6 +219,7 @@ function openLink(string) {
 }
 
 module.exports = {
+	activateSpellChecking: activateSpellChecking,
     autocomplete: autocomplete,
     fillUsermenu: fillUsermenu,
 	doNotify: doNotify,
