@@ -388,6 +388,10 @@ $("#messageInput").keydown(function (e) {
 						}
 						break;
 
+					case 'NICK':
+						ipcRenderer.send('usernameChanged', selectedServer, args);
+						break;
+
 				    default:
 				        console.log('Unknown command');
 				}
