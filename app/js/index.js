@@ -256,12 +256,16 @@ function appendMessage(address, message) {
 
 		for (let key in links) {
 			let link = links[key];
+			
+			//Need to use encoded link from now on to consider &amp; inside
+			//strings that would move the start and end points
+			let linkEnc = util.encodeEntities(link);
 
-			let start = insertStr.indexOf(link);
-			insertStr = insertStr.insert(start, '<a>');
+			let startEnc = insertStr.indexOf(linkEnc);
+			let endEnc = startEnc + linkEnc.length + 3;
 
-			let end = start + link.length + 3;
-			insertStr = insertStr.insert(end, '</a>');
+			insertStr = insertStr.insert(startEnc, '<a>');
+			insertStr = insertStr.insert(endEnc, '</a>');
 		}
 
 		selChannel.find('line:last message').html(insertStr);
