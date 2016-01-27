@@ -14,14 +14,24 @@ initializeMenus();
 util.activateSpellChecking();
 
 ipcRenderer.on('pmReceived', function (event, address, nick, text) {
-	let channel = {
-		name: nick,
-		users: [selectedUsername, nick],
-		messages: []
+	let exists = false;
+	for (let key in displayedServers) {
+		let server = displayedServers[key];
+
+		if (server.address === address) {
+			for (let key in server.channels) {
+				let channel = server.channels[key];
+
+				if (channel === nick) {
+					exists = true;
+				}
+			}
+		}
 	}
 
-	addChannelItem(address, channel);
-	ipcRenderer.send('channelAdded', address, nick);
+	if (!exists) {
+		addPmChannel(address, nick);
+	}
 
 	let message = {
 		from: nick,
@@ -53,6 +63,27 @@ ipcRenderer.on('pmReceived', function (event, address, nick, text) {
 
 	appendMessage(address, message);
 });
+
+function addPmChannel(address, nick) {
+	let channel = {
+		name: nick,
+		users: [selectedUsername, nick],
+		messages: []
+	}
+
+	addChannelItem(address, channel);
+	ipcRenderer.send('channelAdded', address, nick);
+
+	$('#channelList server channel').removeClass('selected');
+
+	let affectedServer = $('server name:contains(' + address + ')').parent();
+	let affectedChannel = affectedServer.children('channel').filter(function () {
+		return ($(this).text() === nick)
+	});
+	affectedChannel.removeClass('unread');
+	affectedChannel.addClass('selected');
+	ipcRenderer.send('channelSelected', address, nick);
+}
 
 /*
 New channel was selected, tell main and trigger visual changes
@@ -256,7 +287,7 @@ function appendMessage(address, message) {
 
 		for (let key in links) {
 			let link = links[key];
-			
+
 			//Need to use encoded link from now on to consider &amp; inside
 			//strings that would move the start and end points
 			let linkEnc = util.encodeEntities(link);
@@ -349,6 +380,13 @@ $("#messageInput").keydown(function (e) {
 						let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
 						selChannel.empty();
 				        break;
+
+					case 'MSG':
+						//TODO add check if args is a valid username
+						if (args !== selectedUsername) {
+							addPmChannel(selectedServer, args)
+						}
+						break;
 
 				    default:
 				        console.log('Unknown command');
