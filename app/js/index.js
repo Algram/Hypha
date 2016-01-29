@@ -410,11 +410,13 @@ $("#messageInput").keydown(function (e) {
 				let message = {
 					from: selectedUsername,
 					to: selectedChannel.name,
-					message: messageContent
+					message: messageContent,
+					event: false,
+					action: false
 				}
 
 				appendMessage(selectedServer, message);
-				ipcRenderer.send('messageSent', selectedServer, message.message);
+				ipcRenderer.send('messageSent', selectedServer, message);
 			}
 		}
 	}
