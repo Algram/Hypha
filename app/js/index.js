@@ -397,6 +397,11 @@ $("#messageInput").keydown(function (e) {
 						ipcRenderer.send('channelRemoved', selectedServer, selectedChannel.name);
 						break;
 
+					case 'JOIN':
+						addChannelItem(selectedServer, args);
+						ipcRenderer.send('channelAdded', selectedServer, args);
+						break;
+
 				    default:
 				        console.log('Unknown command');
 				}
