@@ -392,6 +392,11 @@ $("#messageInput").keydown(function (e) {
 						ipcRenderer.send('usernameChanged', selectedServer, args);
 						break;
 
+					case 'PART':
+						removeChannelItem(selectedServer, selectedChannel.name);
+						ipcRenderer.send('channelRemoved', selectedServer, selectedChannel.name);
+						break;
+
 				    default:
 				        console.log('Unknown command');
 				}
