@@ -16,7 +16,7 @@ class Client {
 		this.addListeners();
 	}
 
-	addChannel(name) {
+	addChannel(name, mode) {
 		let exists = false;
 		for (let key in this.channels) {
 			let selChannel = this.channels[key];
@@ -28,7 +28,13 @@ class Client {
 
 		if (!exists) {
 			//Create a new channel object
-			let ircchannel = new channel.Channel(name);
+			let ircchannel = new channel.Channel(name, mode);
+
+			//Special handling if channel is a pm channel
+			if (mode === 'pm') {
+				ircchannel.addUser({name: this.nick, rank: ''})
+				ircchannel.addUser({name: name, rank: ''})
+			}
 
 			// Add it to the collection.
 			this.channels.push(ircchannel);
@@ -40,10 +46,13 @@ class Client {
 	}
 
 	removeChannel(name) {
+		console.log('Remove Channel', name);
 		for (let key in this.channels) {
+			console.log('1');
 			let selChannel = this.channels[key];
 
 			if (selChannel.getName() === name) {
+				console.log('2');
 				this.channels.splice(key, 1);
 				this.client.part(name);
 			}
@@ -98,6 +107,7 @@ class Client {
 	}
 
 	connect() {
+		console.log('Connecting..', this.address);
 		let client = this.client;
 		let channels = this.channels;
 
@@ -310,9 +320,16 @@ class Client {
 			//console.log('NOTICE: ', nick, to, text, message);
 		});
 
-		this.client.addListener('pm', (nick, text, message) => {
-			console.log('PRIVATEM: ', nick, text, message);
-			this.emit('pmReceived', this.address, nick, text);
+		this.client.addListener('pm', (nick, text, messageObj) => {
+			let message = {
+				from: nick,
+				to: nick,
+				message: text,
+				event: false,
+				action: false
+			}
+
+			this.emit('messageReceived', this.address, message);
 		});
 
 		/*

@@ -75,10 +75,6 @@ class Network {
 		client.on('usernameChanged', (address, nick) => {
 			this.emit('usernameChanged', address, nick);
 		})
-
-		client.on('pmReceived', (address, nick, text) => {
-			this.emit('pmReceived', address, nick, text);
-		})
 	}
 
 }

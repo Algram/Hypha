@@ -44,10 +44,6 @@ app.on('ready', function () {
 		mainWindow.webContents.send('messageReceived', address, message);
 	})
 
-	network.on('pmReceived', function (address, nick, text) {
-		mainWindow.webContents.send('pmReceived', address, nick, text);
-	})
-
 	network.on('userlistChanged', function (address, channel) {
 		mainWindow.webContents.send('userlistChanged', address, channel);
 	})
@@ -90,8 +86,8 @@ app.on('ready', function () {
 		event.sender.send('channelSelected_reply', address, selChannel, network.getClient(address).getNick());
 	});
 
-    ipcMain.on('channelAdded', function (event, address, channelName) {
-        network.getClient(address).addChannel(channelName);
+    ipcMain.on('channelAdded', function (event, address, channelName, mode) {
+        network.getClient(address).addChannel(channelName, mode);
     });
 
 	ipcMain.on('channelRemoved', function (event, address, channelName) {
@@ -194,7 +190,10 @@ function saveState() {
 		for (let key in currClient.channels) {
 			let currChannel = currClient.channels[key];
 
-			channels.push(currChannel.name);
+			//Only save default channels, not e.g. pms
+			if (currChannel.mode === 'default') {
+				channels.push(currChannel.name);
+			}
 		}
 
 		client.nick = nick;

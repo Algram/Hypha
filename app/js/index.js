@@ -13,78 +13,6 @@ let selectedUsername;
 initializeMenus();
 util.activateSpellChecking();
 
-ipcRenderer.on('pmReceived', function (event, address, nick, text) {
-	let exists = false;
-	for (let key in displayedServers) {
-		let server = displayedServers[key];
-
-		if (server.address === address) {
-			for (let key in server.channels) {
-				let channel = server.channels[key];
-
-				if (channel === nick) {
-					exists = true;
-				}
-			}
-		}
-	}
-
-	if (!exists) {
-		addPmChannel(address, nick);
-	}
-
-	let message = {
-		from: nick,
-		to: nick,
-		message: text
-	}
-
-	//Mark as unread if not in selectedChannel
-	if (address !== selectedServer || message.to !== selectedChannel.name) {
-		let affectedServer = $('server name:contains(' + address + ')').parent();
-		let affectedChannel = affectedServer.children('channel').filter(function () {
-			return ($(this).text() === message.to)
-		});
-
-		$(affectedChannel).addClass('unread');
-	}
-
-	//Need to handle when channel is not clicked yet, edge case
-	if (selectedChannel !== undefined) {
-		//Make messages of now selectedChannel visible, hide all others
-		//TODO code-duplication
-		$("#messageArea server").children('channel').css('display', 'none');
-		let selServer = $('[name="' + selectedServer + '"]');
-		let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
-		selChannel.css('display', 'block');
-	} else {
-		$("#messageArea server").children('channel').css('display', 'none');
-	}
-
-	appendMessage(address, message);
-});
-
-function addPmChannel(address, nick) {
-	let channel = {
-		name: nick,
-		users: [selectedUsername, nick],
-		messages: []
-	}
-
-	addChannelItem(address, channel);
-	ipcRenderer.send('channelAdded', address, nick);
-
-	$('#channelList server channel').removeClass('selected');
-
-	let affectedServer = $('server name:contains(' + address + ')').parent();
-	let affectedChannel = affectedServer.children('channel').filter(function () {
-		return ($(this).text() === nick)
-	});
-	affectedChannel.removeClass('unread');
-	affectedChannel.addClass('selected');
-	ipcRenderer.send('channelSelected', address, nick);
-}
-
 /*
 New channel was selected, tell main and trigger visual changes
  */
@@ -117,6 +45,7 @@ ipcRenderer.on('channelSelected_reply', function (event, address, channel, usern
 
 	//Set new username und fill usermenu
 	$('#usernameInput').attr('placeholder', username);
+	console.log(channel);
 	util.fillUsermenu(channel.users);
 
 	//Scroll to last appended message
@@ -384,7 +313,14 @@ $("#messageInput").keydown(function (e) {
 					case 'MSG':
 						//TODO add check if args is a valid username
 						if (args !== selectedUsername) {
-							addPmChannel(selectedServer, args)
+							let channel = {
+								name: args,
+								users: [selectedUsername, args],
+								messages: []
+							}
+
+							addChannelItem(selectedServer, channel);
+							ipcRenderer.send('channelAdded', selectedServer, channel.name, 'pm');
 						}
 						break;
 

@@ -1,10 +1,11 @@
 'use strict';
 
 class Channel {
-	constructor(name) {
+	constructor(name, mode) {
 		this.name = name;
 		this.users = [];
 		this.messages = [];
+		this.mode = mode || 'default';
 	}
 
 	addUser(user) {
