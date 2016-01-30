@@ -11,7 +11,10 @@ let selectedServer = '';
 let selectedChannel;
 let selectedUsername;
 initializeMenus();
-util.activateSpellChecking();
+
+if (process.platform != "win32" && process.platform != "darwin") { // if not windows or OS X
+	util.activateSpellChecking(); // activate spell check
+};
 
 /*
 New channel was selected, tell main and trigger visual changes
