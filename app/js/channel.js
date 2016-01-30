@@ -23,9 +23,6 @@ class Channel {
 			// Add it to the collection.
 			this.users.push(user);
 		}
-
-		// Return this object reference to allow for method chaining.
-		return (this);
 	}
 
 	getUser(name) {
@@ -50,17 +47,11 @@ class Channel {
 				this.users.splice(key, 1);
 			}
 		}
-
-		// Return this object reference to allow for method chaining.
-		return (this);
 	}
 
 	addMessage(message) {
 		// Add it to the collection.
 		this.messages.push(message);
-
-		// Return this object reference to allow for method chaining.
-		return (this);
 	}
 
 	getMessages() {

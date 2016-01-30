@@ -40,19 +40,13 @@ class Client {
 			this.channels.push(ircchannel);
 			this.join(name);
 		}
-
-		// Return this object reference to allow for method chaining.
-		return (this);
 	}
 
 	removeChannel(name) {
-		console.log('Remove Channel', name);
 		for (let key in this.channels) {
-			console.log('1');
 			let selChannel = this.channels[key];
 
 			if (selChannel.getName() === name) {
-				console.log('2');
 				this.channels.splice(key, 1);
 				this.client.part(name);
 			}
@@ -61,9 +55,6 @@ class Client {
 		if (this.channels.length === 0) {
 			this.disconnect('Connection closed');
 		}
-
-		// Return this object reference to allow for method chaining.
-		return (this);
 	}
 
 	getChannel(name) {
@@ -74,16 +65,10 @@ class Client {
 				return channel;
 			}
 		}
-
-		// Return this object reference to allow for method chaining.
-		return (this);
 	}
 
 	setSelectedChannel(channel) {
 		this.selectedChannel = channel;
-
-		// Return this object reference to allow for method chaining.
-		return (this);
 	}
 
 	getSelectedChannel() {
