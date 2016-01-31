@@ -408,8 +408,7 @@ $("#messageInput").keydown(function (e) {
 					messageInput.val(cachedContent + ' ' + name);
 				}
 
-				//Scroll to the right in case the input field is long
-				messageInput[0].scrollLeft = messageInput[0].scrollWidth;
+				util.setCursorToEnd(messageInput);
 			})
 		}
 	}
@@ -591,6 +590,10 @@ function initializeMenus() {
 		channelMenu.popup(remote.getCurrentWindow());
 	})
 }
+
+$('input').on('focus', function() {
+	util.setCursorToEnd($(this));
+})
 
 /**
  * Add tooltip for overflow elements

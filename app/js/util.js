@@ -152,6 +152,15 @@ function updateScrollState() {
 	}, 0);
 }
 
+function setCursorToEnd(jqObj) {
+	//Scroll to the right in case the input field is long
+	jqObj[0].scrollLeft = jqObj[0].scrollWidth;
+
+	//Multiply by 2 to make sure it is always the end
+	let strLength = jqObj.val().length * 2;
+	jqObj[0].setSelectionRange(strLength, strLength);
+}
+
 /**
  * Regex that matches urls in a string in a permissive way.
  * @param  {string} str String to match against
@@ -228,5 +237,6 @@ module.exports = {
 	lastNicksUnique: lastNicksUnique,
 	findLinks: findLinks,
 	updateScrollState: updateScrollState,
+	setCursorToEnd: setCursorToEnd,
 	openLink: openLink
 }
