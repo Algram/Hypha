@@ -1,7 +1,11 @@
 'use strict';
 const path = require('path');
 const shell = require('shell');
+const remote = require('remote');
+const Menu = remote.require('menu');
+const MenuItem = remote.require('menu-item');
 const webFrame = require('electron').webFrame;
+const checker = require('spellchecker');
 
 /**
  * Activates spell checking for every text input that is in the application
@@ -10,11 +14,81 @@ const webFrame = require('electron').webFrame;
  * @return {void} void
  */
 function activateSpellChecking() {
-	webFrame.setSpellCheckProvider("en-US", true, {
+	// set the initial context menu so that a context menu exists even before spellcheck is called
+	let template = [
+		{
+		    label: 'Copy',
+		    role: 'copy',
+		},
+		{
+			label: 'Paste',
+			role: 'paste',
+		},
+		{
+			label: 'Cut',
+			role: 'cut',
+		}
+	];
+	let menu = new Menu();
+	menu = Menu.buildFromTemplate(template);
+
+	webFrame.setSpellCheckProvider("en-US", false, {
 		spellCheck: function(text) {
-			return !(require('spellchecker').isMisspelled(text));
+			if (checker.isMisspelled(text)) {
+				//if this is a misspelling, get suggestions
+				let options = checker.getCorrectionsForMisspelling(text);
+				// get the number of suggestions if any
+				let numSuggestions = options.length ? options.length : 0;
+				// restrict it to 3 suggestions
+				let maxItems = numSuggestions > 3 ? 3 : numSuggestions;
+				let lastSuggestion = null;
+				// if there are suggestions
+				if (maxItems > 0) {
+					for (var i = maxItems-1; i >= 0; i--) {
+						let item = options[i];
+							template.unshift({ label: item, click: function(menuItem, browserWindow) {
+								remote.getCurrentWebContents().replaceMisspelling(menuItem.label);
+							}
+						});
+					}
+					lastSuggestion = maxItems;
+	            	template.splice(lastSuggestion,0,{type: 'separator'});
+				} else {
+					// no suggestions found
+					template.unshift({ label: 'no suggestions', click: function() { } });
+					lastSuggestion = maxItems + 1;
+	            	template.splice(lastSuggestion,0,{type: 'separator'});
+				}
+			}
+
+			// build the new template for the context menu
+			menu = Menu.buildFromTemplate(template);
+			//reset the template object
+			template = [
+				{
+				    label: 'Copy',
+				    role: 'copy',
+				},
+				{
+					label: 'Paste',
+					role: 'paste',
+				},
+				{
+					label: 'Cut',
+					role: 'cut',
+				}
+			];
+
+			return !checker.isMisspelled(text);
 		}
 	});
+
+	$('input').on('contextmenu', function (e) {
+		// use current menu, probably the one that was built the last time spellcheck ran
+	    menu.popup(remote.getCurrentWindow());
+	    // build a new one with only select all in it
+	    menu = Menu.buildFromTemplate(template);
+	})
 }
 
 /**
