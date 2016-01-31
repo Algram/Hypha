@@ -34,11 +34,14 @@ class Client {
 			if (mode === 'pm') {
 				ircchannel.addUser({name: this.nick, rank: ''})
 				ircchannel.addUser({name: name, rank: ''})
-			}
 
-			// Add it to the collection.
-			this.channels.push(ircchannel);
-			this.join(name);
+				// Add it to the collection.
+				this.channels.push(ircchannel);
+			} else {				
+				// Add it to the collection.
+				this.channels.push(ircchannel);
+				this.join(name);
+			}
 		}
 	}
 

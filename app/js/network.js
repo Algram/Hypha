@@ -24,6 +24,7 @@ class Network {
 		}
 
 		let cleanOptions = Object.assign({}, defaultOptions, options);
+		console.log(cleanOptions);
 		let client = new irc.Client(nick, address, cleanOptions);
 		this.clients.push(client);
 
