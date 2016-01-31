@@ -26,12 +26,18 @@ class Channel {
 	}
 
 	getUser(name) {
+		let exists = false;
 		for (let key in this.users) {
 			let user = this.users[key];
 
 			if (user.name === name) {
+				exists = true;
 				return user;
 			}
+		}
+
+		if (!exists) {
+			return null;
 		}
 	}
 

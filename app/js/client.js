@@ -274,8 +274,14 @@ class Client {
 				if (!changedUser) {
 					changedUser = true;
 					let userToRemove = channel.getUser(oldNick);
-					channel.removeUser(userToRemove.name);
-					channel.addUser({name: newNick, rank: userToRemove.rank});
+
+					if (userToRemove !== null) {
+						channel.removeUser(userToRemove.name);
+						channel.addUser({name: newNick, rank: userToRemove.rank});
+					} else {
+						channel.addUser({name: newNick, rank: ''});
+					}
+
 				}
 
 				for (let key in users) {
