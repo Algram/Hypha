@@ -194,7 +194,7 @@ function stringToColour(str) {
 
 	let colors = [
 		'#859900','#cb4b16',
-		'#2aa198','#dc322f',
+		'#4dd1c6','#dc322f',
 		'#268bd2','#6c71c4',
 		'#d33682','#b58900'
 	]
