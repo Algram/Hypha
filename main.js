@@ -131,11 +131,6 @@ app.on('ready', function () {
 
 	require('electron').powerMonitor.on('suspend', function() {
 	  saveState();
-	  let cls = network.getAllClients();
-	  for (let key in cls) {
-		  let cl = cls[key];
-		  cl.disconnect('Connection closed');
-	  }
 	});
 
 	require('electron').powerMonitor.on('resume', function() {
