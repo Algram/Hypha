@@ -144,7 +144,7 @@ a:hover {
     left:0;
     padding: 7px;
     margin-left: 180px;
-    background: rgb(40, 40, 40);
+    background: @color-base;
     color: rgb(220, 220, 220);
 }
 
@@ -154,8 +154,8 @@ a:hover {
     bottom: 0;
     width: 179px;
     color: #fff;
-    background: rgb(40, 40, 40);
-    border-right: 1px solid rgb(60, 60, 60);
+    background: @color-base;
+    border-right: 1px solid @color-base-light;
 }
 
 #channelList server {
@@ -171,21 +171,21 @@ a:hover {
     text-overflow: ellipsis;
     list-style-type: none;
     padding: 7px 28px 7px 10px;
-    background: rgb(40, 40, 40);
+    background: @color-base;
     color: rgb(160, 160, 160);
 }
 
 #channelList channel:hover {
     cursor: pointer;
-	background: rgb(60, 60, 60);
+	background: @color-base-light;
 }
 
 #channelList channel.selected {
-    background: rgb(60, 60, 60);
+    background: @color-base-light;
 }
 
 #channelList channel.unread {
-    color: yellow;
+    color: @color-accent;
 }
 
 #channelList server name {
@@ -194,7 +194,7 @@ a:hover {
     margin: 0 5px 5px;
 	color: rgb(100, 100, 100);
     padding: 0 10px 5px 0;
-    border-bottom: 1px solid rgb(60, 60, 60);
+    border-bottom: 1px solid @color-base-light;
     font-size: 15px;
 }
 
@@ -248,7 +248,7 @@ action {
     left:0;
     margin-left: 180px;
     padding: 10px;
-    background: rgb(40, 40, 40);
+    background: @color-base;
     color: rgb(220, 220, 220);
     word-break: break-word;
     font-family: sans-serif;
@@ -262,7 +262,7 @@ action {
     left: 0;
     right: 0;
     padding: 7px;
-    background: rgb(60, 60, 60);
+    background: @color-base-light;
 }
 
 #writeArea input {
@@ -274,7 +274,7 @@ action {
     border-radius: none;
     padding: 5px;
     border: solid 1px #dcdcdc;
-    color: rgb(40, 40, 40);
+    color: @color-base;
 }
 
 #writeArea input:focus {
