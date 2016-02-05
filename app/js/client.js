@@ -32,8 +32,14 @@ class Client {
 
 			//Special handling if channel is a pm channel
 			if (mode === 'pm') {
-				ircchannel.addUser({name: this.nick, rank: ''})
-				ircchannel.addUser({name: name, rank: ''})
+				ircchannel.addUser({
+					name: this.nick,
+					rank: ''
+				})
+				ircchannel.addUser({
+					name: name,
+					rank: ''
+				})
 
 				// Add it to the collection.
 				this.channels.push(ircchannel);
@@ -109,7 +115,7 @@ class Client {
 
 	disconnect(message) {
 		console.log('beepdiscon');
-		this.client.disconnect(message, function(e) {
+		this.client.disconnect(message, function (e) {
 			console.log('OUTBIY', e);
 		});
 	}
@@ -179,23 +185,23 @@ class Client {
 		this.client.addListener('join', (channelName, nick, messageObj) => {
 			//Filter out own join message
 			if (nick !== this.nick) {
-			    let channel = this.getChannel(channelName);
+				let channel = this.getChannel(channelName);
 
-			    let message = {
-			        from: nick,
-			        to: channelName,
-			        message: nick + ' joined.',
-			        event: true,
-			        action: false
-			    }
+				let message = {
+					from: nick,
+					to: channelName,
+					message: nick + ' joined.',
+					event: true,
+					action: false
+				}
 
 				let user = {
 					name: nick,
 					rank: ''
 				}
 
-			    channel.addUser(user);
-			    channel.addMessage(message);
+				channel.addUser(user);
+				channel.addMessage(message);
 
 				this.emit('messageReceived', this.address, message);
 			}
@@ -280,13 +286,19 @@ class Client {
 
 					if (userToRemove !== null) {
 						channel.removeUser(userToRemove.name);
-						channel.addUser({name: newNick, rank: userToRemove.rank});
+						channel.addUser({
+							name: newNick,
+							rank: userToRemove.rank
+						});
 					} else {
 
 						if (channel.getUser(newNick) !== null) {
 							channel.removeUser(channel.getUser(newNick).name);
 						}
-						channel.addUser({name: newNick, rank: ''});
+						channel.addUser({
+							name: newNick,
+							rank: ''
+						});
 					}
 
 				}

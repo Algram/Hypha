@@ -74,7 +74,7 @@ ipcRenderer.on('usernameChanged', function (event, address, nick) {
 /**
  *  Send keypresses not used elsewhere into the input area
  */
-$(document).keydown(function(e) {
+$(document).keydown(function (e) {
 	if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return;
 
 	const ignored = ['input', 'settings'];
@@ -84,17 +84,17 @@ $(document).keydown(function(e) {
 
 });
 
-$('#titlebar').on('click', 'add',function (e) {
+$('#titlebar').on('click', 'add', function (e) {
 	$('body').toggleClass('prevent');
 	$('.modal').toggleClass('active');
 
 	$('.modal select').empty();
 
-    //testing
-    for(let key in displayedServers) {
-        let server = displayedServers[key];
-        $('.modal select').append('<option>' + server.address + '</option>');
-    }
+	//testing
+	for (let key in displayedServers) {
+		let server = displayedServers[key];
+		$('.modal select').append('<option>' + server.address + '</option>');
+	}
 });
 
 $('.modal .close').click(function (e) {
@@ -102,9 +102,9 @@ $('.modal .close').click(function (e) {
 	$('.modal').toggleClass('active');
 });
 
-$('#addServer').click(function(e) {
+$('#addServer').click(function (e) {
 	let serverAddress = $('#serverInput').val();
-	let serverExists = $('select:contains("' + serverAddress + '")' ).length > 0 ;
+	let serverExists = $('select:contains("' + serverAddress + '")').length > 0;
 	if (!serverExists) {
 		let username = $('#nickInput').val();
 
@@ -129,13 +129,12 @@ $('#addServer').click(function(e) {
 	}
 });
 
-$('#addChannel').click(function(e) {
-    let selServer = $('.modal select :selected').text();
+$('#addChannel').click(function (e) {
+	let selServer = $('.modal select :selected').text();
 	let newChannel = $('#channelInput').val();
 
-    ipcRenderer.send('channelAdded', selServer, newChannel);
+	ipcRenderer.send('channelAdded', selServer, newChannel);
 });
-
 
 //////////////////////
 // Receiving Events //
@@ -304,55 +303,55 @@ $("#messageInput").keydown(function (e) {
 				let args = messageContent.substring(command.length + 2);
 
 				switch (command) {
-				    case 'ME':
-						ipcRenderer.send('actionSent', selectedServer,
-							selectedChannel.name, args);
+				case 'ME':
+					ipcRenderer.send('actionSent', selectedServer,
+						selectedChannel.name, args);
 
-						let message = {
-							from: selectedUsername,
-							to: selectedChannel.name,
-							message: args,
+					let message = {
+						from: selectedUsername,
+						to: selectedChannel.name,
+						message: args,
+					}
+
+					appendAction(selectedServer, message);
+					break;
+
+				case 'CLEAR':
+					let selServer = $('[name="' + selectedServer + '"]');
+					let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
+					selChannel.empty();
+					break;
+
+				case 'MSG':
+					//TODO add check if args is a valid username
+					if (args !== selectedUsername) {
+						let channel = {
+							name: args,
+							users: [selectedUsername, args],
+							messages: []
 						}
 
-						appendAction(selectedServer, message);
-				        break;
+						addChannelItem(selectedServer, channel);
+						ipcRenderer.send('channelAdded', selectedServer, channel.name, 'pm');
+					}
+					break;
 
-				    case 'CLEAR':
-						let selServer = $('[name="' + selectedServer + '"]');
-						let selChannel = selServer.children('[name="' + selectedChannel.name + '"]');
-						selChannel.empty();
-				        break;
+				case 'NICK':
+					ipcRenderer.send('usernameChanged', selectedServer, args);
+					break;
 
-					case 'MSG':
-						//TODO add check if args is a valid username
-						if (args !== selectedUsername) {
-							let channel = {
-								name: args,
-								users: [selectedUsername, args],
-								messages: []
-							}
+				case 'PART':
+					removeChannelItem(selectedServer, selectedChannel.name);
+					ipcRenderer.send('channelRemoved', selectedServer, selectedChannel.name);
+					break;
 
-							addChannelItem(selectedServer, channel);
-							ipcRenderer.send('channelAdded', selectedServer, channel.name, 'pm');
-						}
-						break;
+				case 'JOIN':
+					addChannelItem(selectedServer, args);
+					ipcRenderer.send('channelAdded', selectedServer, args);
+					break;
 
-					case 'NICK':
-						ipcRenderer.send('usernameChanged', selectedServer, args);
-						break;
-
-					case 'PART':
-						removeChannelItem(selectedServer, selectedChannel.name);
-						ipcRenderer.send('channelRemoved', selectedServer, selectedChannel.name);
-						break;
-
-					case 'JOIN':
-						addChannelItem(selectedServer, args);
-						ipcRenderer.send('channelAdded', selectedServer, args);
-						break;
-
-				    default:
-				        console.log('Unknown command');
+				default:
+					console.log('Unknown command');
 				}
 
 			} else {
@@ -461,17 +460,17 @@ function addChannelItem(address, channel) {
 				let selServerCL = $('server name:contains(' + address + ')').parent();
 
 				let toinsert = true;
-				selServerCL.children('channel').each(function() {
+				selServerCL.children('channel').each(function () {
 					let item = $(this).text();
-					if(channel.name.toUpperCase() < item.toUpperCase()){
-						if(toinsert){
+					if (channel.name.toUpperCase() < item.toUpperCase()) {
+						if (toinsert) {
 							$(this).before(line);
 							toinsert = false;
 						}
 					}
 				});
 
-				if(toinsert){
+				if (toinsert) {
 					selServerCL.append(line);
 				}
 
@@ -497,17 +496,17 @@ function addChannelItem(address, channel) {
 			channel.name + '</channel></server>';
 
 		let toinsert = true;
-		$('#channelList').children('server').each(function() {
+		$('#channelList').children('server').each(function () {
 			let item = $(this).children('name').text();
-			if(address.toUpperCase() < item.toUpperCase()){
-				if(toinsert){
+			if (address.toUpperCase() < item.toUpperCase()) {
+				if (toinsert) {
 					$(this).before(line);
 					toinsert = false;
 				}
 			}
 		});
 
-		if(toinsert){
+		if (toinsert) {
 			$('#channelList').append(line);
 		}
 
@@ -574,28 +573,29 @@ function removeChannelItem(address, channelName) {
 function initializeMenus() {
 	//TEXT EDIT MENU
 	let textMenu = Menu.buildFromTemplate([{
-	        label: 'Copy',
-	        role: 'copy',
-	    }
-	]);
+		label: 'Copy',
+		role: 'copy',
+	}]);
 
 	$('#messageArea').on('contextmenu', 'line', function (e) {
 		e.preventDefault();
 		textMenu.popup(remote.getCurrentWindow());
 	})
 
-
 	//CHANNEL REMOVE MENU
 	let channelMenu = new Menu();
 	let elementTargeted;
-	channelMenu.append(new MenuItem({ label: 'Remove', click: function() {
-		let serverAddress = elementTargeted.siblings('name').text();
-		let channelName = elementTargeted.text();
+	channelMenu.append(new MenuItem({
+		label: 'Remove',
+		click: function () {
+			let serverAddress = elementTargeted.siblings('name').text();
+			let channelName = elementTargeted.text();
 
-		removeChannelItem(serverAddress, channelName);
+			removeChannelItem(serverAddress, channelName);
 
-		ipcRenderer.send('channelRemoved', serverAddress, channelName);
-	}}));
+			ipcRenderer.send('channelRemoved', serverAddress, channelName);
+		}
+	}));
 
 	$('#channelList').on('contextmenu', 'channel', function (e) {
 		e.preventDefault();
@@ -604,7 +604,7 @@ function initializeMenus() {
 	})
 }
 
-$('input').on('focus', function() {
+$('input').on('focus', function () {
 	util.setCursorToEnd($(this));
 })
 
@@ -612,11 +612,11 @@ $('input').on('focus', function() {
  * Add tooltip for overflow elements
  */
 $(document).on('mouseover', 'nick, user', function () {
-    var $this = $(this);
+	var $this = $(this);
 
-    if(this.offsetWidth < this.scrollWidth && !$this.attr('title')){
-        $this.attr('title', $this.text());
-    }
+	if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+		$this.attr('title', $this.text());
+	}
 });
 
 /**
@@ -632,15 +632,16 @@ String.prototype.insert = function (index, string) {
 /**
  * Returns a 32bit-int hashcode of a string
  */
-String.prototype.hashCode = function() {
-  var hash = 0, i, chr, len;
-  if (this.length === 0) return hash;
-  for (i = 0, len = this.length; i < len; i++) {
-    chr   = this.charCodeAt(i);
-    hash  = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
+String.prototype.hashCode = function () {
+	var hash = 0,
+		i, chr, len;
+	if (this.length === 0) return hash;
+	for (i = 0, len = this.length; i < len; i++) {
+		chr = this.charCodeAt(i);
+		hash = ((hash << 5) - hash) + chr;
+		hash |= 0; // Convert to 32bit integer
+	}
+	return hash;
 };
 
 /**

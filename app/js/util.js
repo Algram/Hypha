@@ -7,7 +7,7 @@ const MenuItem = remote.require('menu-item');
 const webFrame = require('electron').webFrame;
 try {
 	const checker = require('spellchecker');
-} catch(e) {
+} catch (e) {
 	console.log(e);
 }
 
@@ -22,25 +22,21 @@ function activateSpellChecking() {
 	if (typeof checker === 'undefined') return;
 
 	// set the initial context menu so that a context menu exists even before spellcheck is called
-	let template = [
-		{
-		    label: 'Copy',
-		    role: 'copy',
-		},
-		{
-			label: 'Paste',
-			role: 'paste',
-		},
-		{
-			label: 'Cut',
-			role: 'cut',
-		}
-	];
+	let template = [{
+		label: 'Copy',
+		role: 'copy',
+	}, {
+		label: 'Paste',
+		role: 'paste',
+	}, {
+		label: 'Cut',
+		role: 'cut',
+	}];
 	let menu = new Menu();
 	menu = Menu.buildFromTemplate(template);
 
 	webFrame.setSpellCheckProvider("en-US", false, {
-		spellCheck: function(text) {
+		spellCheck: function (text) {
 			if (checker.isMisspelled(text)) {
 				//if this is a misspelling, get suggestions
 				let options = checker.getCorrectionsForMisspelling(text);
@@ -51,40 +47,45 @@ function activateSpellChecking() {
 				let lastSuggestion = null;
 				// if there are suggestions
 				if (maxItems > 0) {
-					for (var i = maxItems-1; i >= 0; i--) {
+					for (var i = maxItems - 1; i >= 0; i--) {
 						let item = options[i];
-							template.unshift({ label: item, click: function(menuItem, browserWindow) {
+						template.unshift({
+							label: item,
+							click: function (menuItem, browserWindow) {
 								remote.getCurrentWebContents().replaceMisspelling(menuItem.label);
 							}
 						});
 					}
 					lastSuggestion = maxItems;
-	            	template.splice(lastSuggestion,0,{type: 'separator'});
+					template.splice(lastSuggestion, 0, {
+						type: 'separator'
+					});
 				} else {
 					// no suggestions found
-					template.unshift({ label: 'no suggestions', click: function() { } });
+					template.unshift({
+						label: 'no suggestions',
+						click: function () {}
+					});
 					lastSuggestion = maxItems + 1;
-	            	template.splice(lastSuggestion,0,{type: 'separator'});
+					template.splice(lastSuggestion, 0, {
+						type: 'separator'
+					});
 				}
 			}
 
 			// build the new template for the context menu
 			menu = Menu.buildFromTemplate(template);
 			//reset the template object
-			template = [
-				{
-				    label: 'Copy',
-				    role: 'copy',
-				},
-				{
-					label: 'Paste',
-					role: 'paste',
-				},
-				{
-					label: 'Cut',
-					role: 'cut',
-				}
-			];
+			template = [{
+				label: 'Copy',
+				role: 'copy',
+			}, {
+				label: 'Paste',
+				role: 'paste',
+			}, {
+				label: 'Cut',
+				role: 'cut',
+			}];
 
 			return !checker.isMisspelled(text);
 		}
@@ -92,9 +93,9 @@ function activateSpellChecking() {
 
 	$('input').on('contextmenu', function (e) {
 		// use current menu, probably the one that was built the last time spellcheck ran
-	    menu.popup(remote.getCurrentWindow());
-	    // build a new one with only select all in it
-	    menu = Menu.buildFromTemplate(template);
+		menu.popup(remote.getCurrentWindow());
+		// build a new one with only select all in it
+		menu = Menu.buildFromTemplate(template);
 	})
 }
 
@@ -125,8 +126,8 @@ function autocomplete(str, users, callback) {
 function fillUsermenu(usersArr) {
 	$('usermenu users').empty();
 
-	let sortedUsers = usersArr.sort(function(a, b) {
-	    return (a.name > b.name) - (a.name < b.name);
+	let sortedUsers = usersArr.sort(function (a, b) {
+		return (a.name > b.name) - (a.name < b.name);
 	});
 
 	for (let key in sortedUsers) {
@@ -200,10 +201,10 @@ function stringToColour(str) {
 	let colorsExtrapol = [];
 
 	let colors = [
-		'#859900','#cb4b16',
-		'#4dd1c6','#dc322f',
-		'#268bd2','#6c71c4',
-		'#d33682','#b58900'
+		'#859900', '#cb4b16',
+		'#4dd1c6', '#dc322f',
+		'#268bd2', '#6c71c4',
+		'#d33682', '#b58900'
 	]
 
 	for (let i = 0; i < colors.length; i++) {
@@ -310,8 +311,8 @@ function openLink(string) {
 
 module.exports = {
 	activateSpellChecking: activateSpellChecking,
-    autocomplete: autocomplete,
-    fillUsermenu: fillUsermenu,
+	autocomplete: autocomplete,
+	fillUsermenu: fillUsermenu,
 	doNotify: doNotify,
 	encodeEntities: encodeEntities,
 	stringToColour: stringToColour,
