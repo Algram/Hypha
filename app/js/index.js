@@ -29,7 +29,7 @@ $('#channelList').on('click', 'channel', function (e) {
 	$(this).addClass('selected');
 
 	ipcRenderer.send('channelSelected', serverAddress, $(this).text());
-})
+});
 
 ipcRenderer.on('channelSelected_reply', function (event, address, channel, username) {
 	//Set global variables
@@ -69,6 +69,19 @@ ipcRenderer.on('usernameChanged', function (event, address, nick) {
 		//Set new username und fill usermenu
 		$('#usernameInput').attr('placeholder', nick);
 	}
+});
+
+/**
+ *  Send keypresses not used elsewhere into the input area
+ */
+$(document).keydown(function(e) {
+	if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) return;
+
+	const ignored = ['input', 'settings'];
+	if (ignored.includes(e.target.tagName.toLowerCase())) return;
+
+	$('#messageInput').focus();
+
 });
 
 $('#titlebar').on('click', 'add',function (e) {
