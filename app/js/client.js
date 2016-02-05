@@ -37,7 +37,7 @@ class Client {
 
 				// Add it to the collection.
 				this.channels.push(ircchannel);
-			} else {				
+			} else {
 				// Add it to the collection.
 				this.channels.push(ircchannel);
 				this.join(name);
@@ -282,6 +282,10 @@ class Client {
 						channel.removeUser(userToRemove.name);
 						channel.addUser({name: newNick, rank: userToRemove.rank});
 					} else {
+
+						if (channel.getUser(newNick) !== null) {
+							channel.removeUser(channel.getUser(newNick).name);
+						}
 						channel.addUser({name: newNick, rank: ''});
 					}
 

@@ -102,10 +102,9 @@ function autocomplete(str, users, callback) {
 	for (let key in users) {
 		let user = users[key];
 		user = user.split(':')[0];
-		user = user.toLowerCase();
 
 		//Check if str is the start of user
-		if (user.indexOf(str.toLowerCase()) === 0) {
+		if (user.indexOf(str) === 0) {
 			callback(user);
 		}
 	}
