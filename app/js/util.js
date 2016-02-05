@@ -5,7 +5,11 @@ const remote = require('remote');
 const Menu = remote.require('menu');
 const MenuItem = remote.require('menu-item');
 const webFrame = require('electron').webFrame;
-const checker = require('spellchecker');
+try {
+	const checker = require('spellchecker');
+} catch(e) {
+	console.log(e);
+}
 
 /**
  * Activates spell checking for every text input that is in the application
@@ -14,6 +18,9 @@ const checker = require('spellchecker');
  * @return {void} void
  */
 function activateSpellChecking() {
+	// Return if spell checker isn't found
+	if (typeof checker === 'undefined') return;
+
 	// set the initial context menu so that a context menu exists even before spellcheck is called
 	let template = [
 		{
