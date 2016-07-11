@@ -101,7 +101,6 @@ class Client {
 	}
 
 	connect() {
-		console.log('Connecting..', this.address);
 		let client = this.client;
 		let channels = this.channels;
 
@@ -114,9 +113,8 @@ class Client {
 	}
 
 	disconnect(message) {
-		console.log('beepdiscon');
 		this.client.disconnect(message, function (e) {
-			console.log('OUTBIY', e);
+
 		});
 	}
 
