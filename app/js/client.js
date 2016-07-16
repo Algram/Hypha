@@ -327,7 +327,20 @@ class Client {
 		});
 
 		this.client.addListener('notice', (nick, to, text, message) => {
-			//console.log('NOTICE: ', nick, to, text, message);
+			console.log('NOTICE: ', nick, to, text, message);
+
+      switch (nick) {
+        case "Global":
+          let message = {
+            from: nick,
+            to: nick,
+            message: text,
+            event: false,
+            action: false
+          }
+          this.emit('messageReceived', this.address, message)
+          break;
+      }
 		});
 
 		this.client.addListener('pm', (nick, text, messageObj) => {
